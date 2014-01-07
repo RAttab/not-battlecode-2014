@@ -1,2 +1,4 @@
-battlecode-2014
-===============
+not-battlecode-2014
+===================
+
+THIS IS NOT A BATTLE CODE REPOSITORY. YOU'RE LOOKING IN THE WRONG PLACE. MOVE ALONG.
