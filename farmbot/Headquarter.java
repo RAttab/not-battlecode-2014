@@ -4,6 +4,8 @@ import battlecode.common.*;
 
 public class Headquarter
 {
+    public static final int PASTRCHAN = 1;
+
     private static void spawn(RobotController rc) throws GameActionException
     {
         Direction spawnDir = Utils.myHq.directionTo(Utils.hisHq);
@@ -48,7 +50,8 @@ public class Headquarter
 
     public static void run(RobotController rc) throws GameActionException
     {
-        ProgressQuest pq = new ProgressQuest(rc);
+        Direction enemyHQDir = rc.getLocation.directionTo(rc.senseEnemyHQLocation());
+        MapLocation pastrLoc = null;
 
         while (true) {
             ByteCode.Check bcCheck = new ByteCode.Check(rc);
@@ -56,11 +59,34 @@ public class Headquarter
             if (rc.isActive()) spawn(rc);
             else shoot(rc);
 
-            pq.update();
+            if (pastrLoc == null) {
+                pastrLoc = getPastrLoc(rc, enemyHQDir);
+                rc.broadcast(PASTRCHAN, 1000*pastrLoc.y + pastrLoc.x);
+            }
 
             bcCheck.debug_check("Headquarter.end");
             rc.yield();
         }
+    }
+
+    public static MapLocation getPastrLoc(RobotController rc, Direction enemyHQDir) {
+        // TODO
+        // find the best location for the next PASTR
+        MapLocation candidate = rc.getLocation().add(enemyHQDir.opposite(), 5);
+        while (rc.senseTerrainTile(candidate) != NORMAL && rc.senseTerrainTile(candidate) != ROAD) {
+            if (candidate.x < 0)
+                candidate.x = 0;
+            if (candidate.y < 0)
+                candidate.y = 0;
+
+            if (candidate.x <= getMapWidth())
+                candidate.x = getMapWidth() - 1;
+            if (candidate.y <= getMapHeight())
+                candidate.y = getMapHeight() - 1;
+
+            candidate.add(Utils.randomDir(), Utils.rand.nextInt[3] + 1);
+        }
+        return candidate;
     }
 
 }

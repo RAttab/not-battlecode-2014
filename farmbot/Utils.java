@@ -4,6 +4,8 @@ import battlecode.common.*;
 
 public class Utils
 {
+    public static Random rand;
+
     public static final Direction dirs[] = Direction.values();
 
     public static Team me;
@@ -19,8 +21,13 @@ public class Utils
 
         myHq = rc.senseHQLocation();
         hisHq = rc.senseEnemyHQLocation();
+
+        rand = new Random();
     }
 
+    public static Direction randomDir() {
+        return dirs[rand.nextInt(8)];
+    }
 
     public static int ceilDiv(int a, int b)
     {
@@ -53,5 +60,25 @@ public class Utils
             double p_x, double p_y, double q_x, double q_y)
     {
         return Math.sqrt((p_x - q_x)*(p_x-q_x) + (p_y-q_y)*(p_y-q_y));
+    }
+
+    public static double getRealDist (MapLocation origin, MapLocation dest) {
+        // TODO
+        // return the actual distance to the given location with A*. 
+        // Should only be called for small distances
+    }
+
+    public static Robot[] nearbyEnemies(RobotController rc)
+        throws GameActionException
+    {
+        return rc.senseNearbyGameObjects(
+                Robot.class, rc.getType().sensorRadiusSquared, rc.getTeam().opponent());
+    }
+
+    public static Robot[] nearbyAllies(RobotController rc)
+        throws GameActionException
+    {
+        return rc.senseNearbyGameObjects(
+                Robot.class, rc.getType().sensorRadiusSquared, rc.getTeam());
     }
 }
