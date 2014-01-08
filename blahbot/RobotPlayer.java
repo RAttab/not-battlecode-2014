@@ -8,6 +8,8 @@ public class RobotPlayer
 
     public static void run(RobotController rc)
     {
+        Utils.init(rc);
+
         while (true) {
             try {
                 if (rc.getType() == RobotType.SOLDIER) Soldier.run(rc);

@@ -4,8 +4,23 @@ import battlecode.common.*;
 
 public class Utils
 {
+    public static final Direction dirs[] = Direction.values();
 
-    public static final Direction dirByOrd[] = Direction.values();
+    private static Team me = rc.getTeam();
+    private static MapLocation myHq = rc.senseHQLocation();
+
+    private static Team him = me.opponent();
+    private static MapLocation hisHq = rc.senseEnemyHQLocation();
+
+    public static void init(RobotController rc)
+    {
+        me = rc.getTeam();
+        him = me.opponent();
+
+        myHq = rc.senseHQLocation();
+        hisHq = rc.senseEnemyHQLocation();
+    }
+
 
     public static int ceilDiv(int a, int b)
     {
