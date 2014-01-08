@@ -35,18 +35,13 @@ public class Utils
         double t = ((p.x - v.x)*(w.x - v.x) + (p.y - v.y)*(w.y - v.y)) / hqDists;
 
         if (t < 0)
-            return distTwoPoints(p, v);
+            return Math.sqrt(p.distanceSquaredTo(v));
         if (t > 1)
-            return distTwoPoints(p, w);
+            return Math.sqrt(p.distanceSquaredTo(w));
 
         double d = 
             distTwoPoints((double)p.x, (double)p.y, v.x+t*(w.x-v.x), v.y+t*(w.y-v.y) );
         return Math.sqrt(d);
-    }
-
-    public static double distTwoPoints(MapLocation p, MapLocation q)
-    {
-        return Math.sqrt((p.x - q.x)*(p.x-q.x) + (p.y-q.y)*(p.y-q.y));
     }
 
     public static double distTwoPoints(
