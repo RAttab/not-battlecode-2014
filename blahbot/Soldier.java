@@ -6,14 +6,15 @@ import battlecode.common.*;
 public class Soldier
 {
 
-    public static void run(RobotController rc)
-        throws GameActionException
+    public static void run(RobotController rc) throws GameActionException
     {
+        BugPath pathing = new BugPath(rc, Utils.hisHq);
+
         while (true) {
             if (!rc.isActive()) { rc.yield(); continue; }
             ByteCode.Check bcCheck = new ByteCode.Check(rc);
 
-            // Code goes here.
+            pathing.move();
 
             bcCheck.debug_check("Soldier.end");
             rc.yield();
