@@ -36,7 +36,7 @@ public class ProgressQuest
     private RobotController rc;
 
     private static final int ProgressRate = 1;
-    private static final int MaxProgress = 100;
+    private static final int MaxProgress = 45;
 
     private static final String Lines[] = {
         "Experiencing an enigmatic and foreboding night vision...",
