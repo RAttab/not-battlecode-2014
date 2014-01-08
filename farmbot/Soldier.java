@@ -6,7 +6,7 @@ import battlecode.common.*;
 public class Soldier
 {
 
-    public enum State = { NONE, FARMING, MOVING, FIGHTING };
+    public enum State { NONE, FARMING, MOVING, FIGHTING };
 
     public static void run(RobotController rc)
         throws GameActionException
@@ -23,21 +23,22 @@ public class Soldier
             myLoc = rc.getLocation();
 
             Robot[] enemies = Utils.nearbyEnemies(rc);
-            if (enemies.length) {
-                //TODO
-            }
+            // if (enemies.length) {
+            //     //TODO
+            // }
 
 
-            if (myState = State.MOVING) {
+            if (myState == State.MOVING) {
                 int goalCoord = rc.readBroadcast(Headquarter.PASTRCHAN);
                 int y = goalCoord / 1000;
                 goal = new MapLocation(goalCoord - y, y);
 
-                if (distTwoPoints(goal, myLoc) < 2){
+                if (Utils.distTwoPoints(goal, myLoc) < 2){
                     rc.construct(RobotType.PASTR);
-                } else if (nextDir != Direction.NONE){
+                } else {
                     Direction nextDir = move(rc, myLoc, goal);
-                    rc.move(myLoc.add(nextDir));
+                    if (nextDir != Direction.NONE)
+                        rc.move(nextDir);
                 }
             }
 

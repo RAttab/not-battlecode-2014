@@ -50,7 +50,7 @@ public class Headquarter
 
     public static void run(RobotController rc) throws GameActionException
     {
-        Direction enemyHQDir = rc.getLocation.directionTo(rc.senseEnemyHQLocation());
+        Direction enemyHQDir = rc.getLocation().directionTo(rc.senseEnemyHQLocation());
         MapLocation pastrLoc = null;
 
         while (true) {
@@ -73,18 +73,19 @@ public class Headquarter
         // TODO
         // find the best location for the next PASTR
         MapLocation candidate = rc.getLocation().add(enemyHQDir.opposite(), 5);
-        while (rc.senseTerrainTile(candidate) != NORMAL && rc.senseTerrainTile(candidate) != ROAD) {
+        while (rc.senseTerrainTile(candidate) != TerrainTile.NORMAL 
+                && rc.senseTerrainTile(candidate) != TerrainTile.ROAD) {
             if (candidate.x < 0)
-                candidate.x = 0;
+                candidate = new MapLocation(0, candidate.y);
+            else if (candidate.x <= rc.getMapWidth())
+                candidate = new MapLocation(rc.getMapWidth() - 1, candidate.y);
+            
             if (candidate.y < 0)
-                candidate.y = 0;
+                candidate = new MapLocation(candidate.x, 0);
+            else if (candidate.y <= rc.getMapHeight())
+                candidate = new MapLocation(candidate.x, rc.getMapHeight() - 1);
 
-            if (candidate.x <= getMapWidth())
-                candidate.x = getMapWidth() - 1;
-            if (candidate.y <= getMapHeight())
-                candidate.y = getMapHeight() - 1;
-
-            candidate.add(Utils.randomDir(), Utils.rand.nextInt[3] + 1);
+            candidate.add(Utils.randomDir(), Utils.rand.nextInt(3) + 1);
         }
         return candidate;
     }

@@ -1,6 +1,7 @@
 package farmbot;
 
 import battlecode.common.*;
+import java.util.*;
 
 public class Utils
 {
@@ -66,6 +67,7 @@ public class Utils
         // TODO
         // return the actual distance to the given location with A*. 
         // Should only be called for small distances
+        return 0;
     }
 
     public static Robot[] nearbyEnemies(RobotController rc)
