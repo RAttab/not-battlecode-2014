@@ -8,8 +8,8 @@ public class Headquarter
     {
         Direction spawnDir = Utils.myHq.directionTo(Utils.hisHq);
 
-        for (int i = spawnDir.ordinal(); i < 8; i = (i + 1) % 8) {
-            Direction dir = Utils.dirs[i];
+        for (int i = spawnDir.ordinal(); i < 8; i++) {
+            Direction dir = Utils.dirs[i % 8];
             if (!rc.canMove(dir)) continue;
             rc.spawn(dir);
             break;
@@ -48,14 +48,15 @@ public class Headquarter
 
     public static void run(RobotController rc) throws GameActionException
     {
+        ProgressQuest pq = new ProgressQuest(rc);
+
         while (true) {
             ByteCode.Check bcCheck = new ByteCode.Check(rc);
 
-            if (rc.isActive()) {
-                System.out.printf("[%d] spawn\n", Clock.getRoundNum());
-                spawn(rc);
-            }
+            if (rc.isActive()) spawn(rc);
             else shoot(rc);
+
+            pq.update();
 
             bcCheck.debug_check("Headquarter.end");
             rc.yield();
