@@ -1,4 +1,4 @@
-package team216;
+package blahbot;
 
 import battlecode.common.*;
 
@@ -6,11 +6,11 @@ public class Utils
 {
     public static final Direction dirs[] = Direction.values();
 
-    private static Team me = rc.getTeam();
-    private static MapLocation myHq = rc.senseHQLocation();
+    public static Team me;
+    public static Team him;
 
-    private static Team him = me.opponent();
-    private static MapLocation hisHq = rc.senseEnemyHQLocation();
+    public static MapLocation myHq;
+    public static MapLocation hisHq;
 
     public static void init(RobotController rc)
     {

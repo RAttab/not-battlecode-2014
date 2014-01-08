@@ -4,8 +4,7 @@ import battlecode.common.*;
 
 public class Headquarter
 {
-
-    private static void spawn(RobotController rc)
+    private static void spawn(RobotController rc) throws GameActionException
     {
         Direction spawnDir = Utils.myHq.directionTo(Utils.hisHq);
 
@@ -13,27 +12,28 @@ public class Headquarter
             Direction dir = Utils.dirs[i];
             if (!rc.canMove(dir)) continue;
             rc.spawn(dir);
+            break;
         }
     }
 
-    private static void shoot(RobotController rc)
+    private static void shoot(RobotController rc) throws GameActionException
     {
-        static final int SplashRd = 2;
-        static final int AttackRd = RobotType.HQ.attackRadiusMaxSquared;
+        final int SplashRd = 2;
+        final int AttackRd = RobotType.HQ.attackRadiusMaxSquared;
 
-        Robot objs[] = senseNearbyGameObjects(Robot.class, AttackRd, Utils.him);
+        Robot objs[] = rc.senseNearbyGameObjects(Robot.class, AttackRd, Utils.him);
 
         Robot bestTarget = null;
-        int bestScore = 50;
+        double bestScore = 50;
 
-        for (int i = 0; i < objs.length(); ++i) {
-            int score = RobotType.HQ.attackPower;
+        for (int i = 0; i < objs.length; ++i) {
+            double score = RobotType.HQ.attackPower;
 
-            Robot dmg[] = senseNearbyGameObjects(Robot.class, SplashRd, Utils.him);
-            score += dmg.length() * RobotType.HQ.splashPower;
+            Robot dmg[] = rc.senseNearbyGameObjects(Robot.class, SplashRd, Utils.him);
+            score += dmg.length * RobotType.HQ.splashPower;
 
-            Robot ff[] = senseNearbyGameObjects(Robot.class, SplashRd, Utils.me);
-            score -= ff.length() * RobotType.HQ.splashPower;
+            Robot ff[] = rc.senseNearbyGameObjects(Robot.class, SplashRd, Utils.me);
+            score -= ff.length * RobotType.HQ.splashPower;
 
             if (score < bestScore) continue;
 
@@ -43,7 +43,7 @@ public class Headquarter
 
         if (bestTarget == null) return;
 
-        rc.attackSquare(rc.senseLocationOf(objs[i]));
+        rc.attackSquare(rc.senseLocationOf(bestTarget));
     }
 
     public static void run(RobotController rc) throws GameActionException
@@ -51,8 +51,11 @@ public class Headquarter
         while (true) {
             ByteCode.Check bcCheck = new ByteCode.Check(rc);
 
-            if (rc.isActive()) spawn();
-            else shoot();
+            if (rc.isActive()) {
+                System.out.printf("[%d] spawn\n", Clock.getRoundNum());
+                spawn(rc);
+            }
+            else shoot(rc);
 
             bcCheck.debug_check("Headquarter.end");
             rc.yield();
