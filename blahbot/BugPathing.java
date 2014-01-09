@@ -2,10 +2,10 @@ package blahbot;
 
 import battlecode.common.*;
 
-public class BugPath
+class BugPathing
 {
 
-    BugPath(RobotController rc, MapLocation dest)
+    BugPathing(RobotController rc, MapLocation dest)
     {
         this.rc = rc;
         target = dest;
@@ -60,6 +60,7 @@ public class BugPath
         move(dir);
         return true;
     }
+
     void move(Direction dir) throws GameActionException
     {
         if (dir == Direction.NONE) {
@@ -79,6 +80,7 @@ public class BugPath
         sneak(dir);
         return true;
     }
+
     void sneak(Direction dir) throws GameActionException
     {
         if (dir == Direction.NONE) {

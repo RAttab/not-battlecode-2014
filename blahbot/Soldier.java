@@ -8,7 +8,7 @@ public class Soldier
 
     public static void run(RobotController rc) throws GameActionException
     {
-        BugPath pathing = new BugPath(rc, Utils.hisHq);
+        BugPathing pathing = new BugPathing(rc, Utils.hisHq);
 
         while (true) {
             if (!rc.isActive()) { rc.yield(); continue; }
