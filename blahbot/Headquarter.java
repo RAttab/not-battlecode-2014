@@ -4,16 +4,20 @@ import battlecode.common.*;
 
 public class Headquarter
 {
-    private static void spawn(RobotController rc) throws GameActionException
+    private static boolean spawn(RobotController rc) throws GameActionException
     {
+        if (rc.senseRobotCount() == GameConstants.MAX_ROBOTS) return false;
+
         Direction spawnDir = Utils.myHq.directionTo(Utils.hisHq);
 
         for (int i = spawnDir.ordinal(); i < 8; i++) {
             Direction dir = Utils.dirs[i % 8];
             if (!rc.canMove(dir)) continue;
             rc.spawn(dir);
-            break;
+            return true;
         }
+
+        return false;
     }
 
     private static void shoot(RobotController rc) throws GameActionException
@@ -53,7 +57,7 @@ public class Headquarter
         while (true) {
             ByteCode.Check bcCheck = new ByteCode.Check(rc);
 
-            if (rc.isActive()) spawn(rc);
+            if (rc.isActive() && spawn(rc));
             else shoot(rc);
 
             pq.update();
