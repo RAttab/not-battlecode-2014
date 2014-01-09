@@ -19,6 +19,8 @@ public class ProgressQuest
 
         int line = (progress / MaxProgress) % Lines.length;
         rc.setIndicatorString(2, Lines[line]);
+        if (progress % MaxProgress == 0)
+            System.out.println(Lines[line]);
     }
 
     private String bar(int progress)
