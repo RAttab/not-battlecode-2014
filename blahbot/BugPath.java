@@ -9,55 +9,56 @@ public class BugPath
     {
         this.rc = rc;
         target = dest;
+        touched = new boolean[rc.getMapWidth()][rc.getMapHeight()];
     }
 
     /* \todo Always turning to the right isn't that great of an idea but we can
              improve later.
-
-       \todo Avoid going around in circles.
     */
     Direction direction()
     {
-        if (unreachable) rc.breakpoint();
+        if (unreachable) {
+            rc.breakpoint();
+            return Direction.NONE;
+        }
 
+        Direction result = Direction.NONE;
         MapLocation pos = rc.getLocation();
         Direction targetDir = pos.directionTo(target);
 
         int ord = targetDir.ordinal();
 
-        System.out.println("moving(" + target.toString() + ")"
-                + ": pos=" + pos.toString()
-                + ", dir=" + targetDir.toString()
-                + ", ord=" + ord
-                + ", backtrack=" + backtrackOrd);
-
         for (int i = 8; --i > 0; ord = (ord + 1) % 8) {
-
-            String dbg = "- " + i + "-" + ord + ": ";
-
-            if (ord == backtrackOrd) {
-                System.out.println(dbg + "backtrack");
-                continue;
-            }
+            if (ord == backtrackOrd) continue;
 
             Direction dir = Utils.dirs[ord];
-            if (!rc.canMove(dir)) {
-                System.out.println(dbg + "wall");
-                continue;
-            }
+            if (!rc.canMove(dir)) continue;
 
-            System.out.println(dbg + "move");
-            backtrackOrd = dir.opposite().ordinal();
-            return dir;
+            result = dir;
+            break;
         }
 
-        System.out.println("=> stuck");
-        return Direction.NONE;
+        // got stuck.
+        if (result == Direction.NONE) return result;
+
+        MapLocation newPos = pos.add(result);
+        if (touched[newPos.x][newPos.y]) {
+            unreachable = true;
+            return Direction.NONE;
+        }
+
+        touched[pos.x][pos.y] = true;
+        backtrackOrd = result.opposite().ordinal();
+        return result;
     }
 
-    void move() throws GameActionException
+    boolean move() throws GameActionException
     {
-        move(direction());
+        Direction dir = direction();
+        if (dir == Direction.NONE) return false;
+
+        move(dir);
+        return true;
     }
     void move(Direction dir) throws GameActionException
     {
@@ -70,9 +71,13 @@ public class BugPath
         rc.move(dir);
     }
 
-    void sneak() throws GameActionException
+    boolean sneak() throws GameActionException
     {
-        sneak(direction());
+        Direction dir = direction();
+        if (dir == Direction.NONE) return false;
+
+        sneak(dir);
+        return true;
     }
     void sneak(Direction dir) throws GameActionException
     {
@@ -89,6 +94,8 @@ public class BugPath
     MapLocation target;
 
     int backtrackOrd = Direction.NONE.ordinal();
+
+    boolean touched[][];
     boolean unreachable = false;
 
     RobotController rc;
