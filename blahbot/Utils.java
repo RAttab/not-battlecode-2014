@@ -6,11 +6,14 @@ public class Utils
 {
     public static final Direction dirs[] = Direction.values();
 
+    public static final int SelfDestructRangeSq = 2;
+
     public static Team me;
     public static Team him;
 
     public static MapLocation myHq;
     public static MapLocation hisHq;
+
 
     public static void init(RobotController rc)
     {
