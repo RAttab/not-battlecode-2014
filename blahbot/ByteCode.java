@@ -43,7 +43,7 @@ public class ByteCode
             start = Clock.getBytecodeNum();
         }
 
-        void get()
+        int get()
         {
             int stop = Clock.getBytecodeNum();
             int len;
@@ -61,7 +61,7 @@ public class ByteCode
 
     static class ProfilerDist
     {
-        SamplingProfiler() {}
+        ProfilerDist() {}
 
         void debug_start() { prof = new Profiler(); }
         void debug_stop()

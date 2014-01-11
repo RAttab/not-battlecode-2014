@@ -22,7 +22,7 @@ public class Soldier
             if (!rc.isActive()) { rc.yield(); continue; }
             ByteCode.Check bcCheck = new ByteCode.Check(rc);
 
-            if (micro.isMicro) {
+            if (micro.isMicro()) {
                 pathing = null;
                 micro.exterminate();
             }

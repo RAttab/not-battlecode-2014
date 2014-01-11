@@ -13,16 +13,16 @@ public class SoldierMicro
     boolean isMicro()
     {
         visibleEnemies = rc.senseNearbyGameObjects(
-                Robot.class, RobotType.Soldier.sensorRadiusSquared, Utils.him);
+                Robot.class, RobotType.SOLDIER.sensorRadiusSquared, Utils.him);
 
-        if (visibleEnemies.length == 0) return false;
+        return visibleEnemies.length > 0;
     }
 
 
     void suicide(Robot[] suicideEnemies) throws GameActionException
     {
         final MapLocation pos = rc.getLocation();
-        final int attackPw = RobotType.Soldier.attackPower;
+        final double attackPw = RobotType.SOLDIER.attackPower;
 
         double health = rc.getHealth();
         double dmg = GameConstants.SELF_DESTRUCT_BASE_DAMAGE +
@@ -34,11 +34,11 @@ public class SoldierMicro
 
         // Survey the potential carnage.
         for (int i = suicideEnemies.length; i-- > 0;) {
-            RobotInfo info = target = rc.senseRobotInfo(nearbyBad[i]);
+            RobotInfo info = target = rc.senseRobotInfo(suicideEnemies[i]);
             if (info.type == RobotType.HQ) continue;
 
             totalDmg += Math.min(dmg, info.health);
-            killed += dmg >= info.health;
+            killed += dmg >= info.health ? 1 : 0;
         }
 
         // Will this hurt me more then it'll hurt you?
@@ -46,12 +46,12 @@ public class SoldierMicro
             Robot[] allies = rc.senseNearbyGameObjects(
                     Robot.class, Utils.SelfDestructRangeSq, Utils.me);
 
-            for (int i = suicide.length; i-- > 0;) {
-                RobotInfo info = rc.senseRobotInfo(nearbyBad[i]);
+            for (int i = allies.length; i-- > 0;) {
+                RobotInfo info = rc.senseRobotInfo(allies[i]);
                 if (info.type == RobotType.HQ) continue;
 
                 totalDmg -= Math.min(dmg, info.health);
-                killed -= dmg >= info.health;
+                killed -= dmg >= info.health ? 1 : 0;
             }
         }
 
@@ -71,8 +71,8 @@ public class SoldierMicro
     void attack(Robot[] reachableEnemies) throws GameActionException
     {
         final MapLocation pos = rc.getLocation();
-        final int attackPw = RobotType.Soldier.attackPower;
-        final int attackRd = RobotType.Soldier.attackRadiusMaxSquared;
+        final double attackPw = RobotType.SOLDIER.attackPower;
+        final int attackRd = RobotType.SOLDIER.attackRadiusMaxSquared;
 
         int centerX = 0, centerY = 0;
         double hisHealth = 0.0;
@@ -80,13 +80,13 @@ public class SoldierMicro
         // Look for a target to shoot and gather some stats about the enemy.
 
         RobotInfo target = null;
-        boolean targetShots = RobotType.Soldier.maxHealth + 1;
+        double targetShots = RobotType.SOLDIER.maxHealth + 1;
 
         RobotInfo nearest = null;
         int nearestDist = 0;
 
         for (int i = reachableEnemies.length; i-- > 0;) {
-            RobotInfo info = rc.senseRobotInfo(nearbyBad[i]);
+            RobotInfo info = rc.senseRobotInfo(reachableEnemies[i]);
             if (info.type == RobotType.HQ) continue;
 
             centerX += info.location.x;
@@ -97,7 +97,7 @@ public class SoldierMicro
 
             if (target == null) {
                 target = nearest = info;
-                targetSHots = info.health / attackPw;
+                targetShots = info.health / attackPw;
                 nearestDist = dist;
                 continue;
             }
@@ -108,12 +108,12 @@ public class SoldierMicro
             }
 
             // Prefer non-constructing robots.
-            if (info.isConstructing && !target.isContructing) continue;
-            if (info.type != RobotType.Soldier && target.type == RobotType.Soldier)
+            if (info.isConstructing && !target.isConstructing) continue;
+            if (info.type != RobotType.SOLDIER && target.type == RobotType.SOLDIER)
                 continue;
 
             // Prefer things that we can kill faster.
-            int shots = info.health / attackPw;
+            double shots = info.health / attackPw;
             if (shots > targetShots) continue;
             if (shots < targetShots) {
                 target = info;
@@ -122,27 +122,27 @@ public class SoldierMicro
             }
 
             // Final tie breaker is which robots is next to attacks.
-            if (info.attackDelay >= target.attackDelay) continue;
+            if (info.actionDelay >= target.actionDelay) continue;
 
             target = info;
             targetShots = shots;
         }
 
-        centerX /= nearbyBad.length;
-        centerY /= nearbyBad.length;
+        centerX /= reachableEnemies.length;
+        centerY /= reachableEnemies.length;
 
 
         // Gather some stats about our allies.
 
-        Robot[] reachableAllies = rc.senseNearbyGameObjects(
+        Robot[] allies = rc.senseNearbyGameObjects(
                 Robot.class, attackRd, Utils.me);
 
-        doubl health = rc.getHealth();
+        double health = rc.getHealth();
         double myHealth = health;
-        double minHealth = RobotType.Soldier.health + 1;
+        double minHealth = RobotType.SOLDIER.maxHealth + 1;
 
-        for (int i = reachableAllies.length; i-- > 0;) {
-            RobotInfo info = rc.senseRobotInfo(nearbyBad[i]);
+        for (int i = allies.length; i-- > 0;) {
+            RobotInfo info = rc.senseRobotInfo(allies[i]);
             if (info.type == RobotType.HQ) continue;
 
             hisHealth += info.health;
@@ -174,7 +174,7 @@ public class SoldierMicro
 
         // Oh shit. We have guns? Pew pew!
 
-        rc.attackSquare(target.location);
+        if (target != null) rc.attackSquare(target.location);
     }
 
 
@@ -190,13 +190,10 @@ public class SoldierMicro
 
         for (int i = visibleEnemies.length; i-- > 0; ) {
             RobotInfo info = rc.senseRobotInfo(visibleEnemies[i]);
-            if (info.type == RobotType.HQ) continue;
-
-            if (target == null) target = info;
-
 
             if (info.type != RobotType.SOLDIER) {
-                if (base.type == RobotType.NOISETOWER) base = info;
+                if (base == null) base = info;
+                else if (base.type == RobotType.NOISETOWER) base = info;
                 continue;
             }
 
@@ -218,7 +215,7 @@ public class SoldierMicro
         Robot[] allies  = rc.senseNearbyGameObjects(
                 Robot.class, RobotType.SOLDIER.sensorRadiusSquared, Utils.me);
 
-        if (enemies <= allies + 1) move(pos.directionTo(center));
+        if (enemies <= allies.length + 1) move(pos.directionTo(center));
         else move(center.directionTo(pos));
     }
 
@@ -235,7 +232,7 @@ public class SoldierMicro
         }
 
         Robot[] reachableEnemies = rc.senseNearbyGameObjects(
-                Robot.class, RobotType.Soldier.attackRadiusMaxSquared, Utils.him);
+                Robot.class, RobotType.SOLDIER.attackRadiusMaxSquared, Utils.him);
         if (reachableEnemies.length > 0) {
             attackProf.debug_start();
             attack(reachableEnemies);
@@ -249,15 +246,16 @@ public class SoldierMicro
     }
 
 
-    boolean canMoveTo(MapLocation dest, int max)
+    boolean canMoveTo(MapLocation dest, int max) throws GameActionException
     {
-        if (Math.sqrt(src.distanceSquaredTo(dest)) > max)
+        final MapLocation pos = rc.getLocation();
+        if (Math.sqrt(pos.distanceSquaredTo(dest)) > max)
             return false;
 
         MapLocation it = rc.getLocation();
 
         for (int i = 0; i < max; ++i) {
-            it = it.add(src.directionTo(dest));
+            it = it.add(pos.directionTo(dest));
             if (it.equals(dest)) return true;
 
             if (!rc.senseTerrainTile(it).isTraversableAtHeight(RobotLevel.ON_GROUND))
@@ -270,8 +268,9 @@ public class SoldierMicro
         return false;
     }
 
-    void move(Direction dir)
+    void move(Direction dir) throws GameActionException
     {
+        if (!rc.canMove(dir)) return;
         final MapLocation pos = rc.getLocation();
 
         boolean mySide =
@@ -286,7 +285,7 @@ public class SoldierMicro
     void debug_dump()
     {
         suicideProf.debug_dump("micro.suicide");
-        attacckProf.debug_dump("micro.attack");
+        attackProf.debug_dump("micro.attack");
         visibleProf.debug_dump("micro.visible");
     }
 
