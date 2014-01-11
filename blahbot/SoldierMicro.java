@@ -271,15 +271,7 @@ public class SoldierMicro
     void move(Direction dir) throws GameActionException
     {
         if (!rc.canMove(dir)) return;
-        final MapLocation pos = rc.getLocation();
-
-        boolean mySide =
-            Utils.myHq.distanceSquaredTo(pos) <=
-            Utils.hisHq.distanceSquaredTo(pos);
-
-        if (mySide)
-            rc.sneak(dir);
-        else rc.move(dir);
+        rc.move(dir);
     }
 
     void debug_dump()

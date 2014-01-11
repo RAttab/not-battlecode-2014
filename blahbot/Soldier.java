@@ -6,11 +6,29 @@ import battlecode.common.*;
 public class Soldier
 {
 
-    public static void debug_dump(SoldierMicro micro)
+    static void debug_dump(SoldierMicro micro)
     {
         if (Clock.getRoundNum() % 10 > 0) return;
 
         micro.debug_dump();
+    }
+
+    static void move(RobotController rc, Direction dir)
+        throws GameActionException
+    {
+        if (dir == Direction.NONE || dir == Direction.OMNI) {
+            rc.breakpoint();
+            return;
+        }
+
+        final MapLocation pos = rc.getLocation();
+        boolean mySide =
+            pos.distanceSquaredTo(Utils.myHq) <=
+            pos.distanceSquaredTo(Utils.hisHq);
+
+        if (mySide)
+            rc.sneak(dir);
+        else rc.move(dir);
     }
 
     public static void run(RobotController rc) throws GameActionException
@@ -30,7 +48,8 @@ public class Soldier
             else {
                 if (pathing == null)
                     pathing = new BugPathing(rc, Utils.hisHq);
-                pathing.move();
+
+                move(rc, pathing.direction());
             }
 
             debug_dump(micro);
