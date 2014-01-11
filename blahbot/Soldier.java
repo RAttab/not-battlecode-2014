@@ -6,6 +6,13 @@ import battlecode.common.*;
 public class Soldier
 {
 
+    public static void debug_dump(SoldierMicro micro)
+    {
+        if (Clock.getRoundNum() % 10 > 0) return;
+
+        micro.debug_dump();
+    }
+
     public static void run(RobotController rc) throws GameActionException
     {
         BugPathing pathing = null;
@@ -26,6 +33,7 @@ public class Soldier
                 pathing.move();
             }
 
+            debug_dump(micro);
             bcCheck.debug_check("Soldier.end");
             rc.yield();
         }
