@@ -43,14 +43,44 @@ public class ByteCode
             start = Clock.getBytecodeNum();
         }
 
-        void debug_dump(String str)
+        void get()
         {
             int stop = Clock.getBytecodeNum();
             int len;
             if (Clock.getRoundNum() > round)
                 len = 10000 - start + stop;
             else len = stop - start;
-            System.out.println("profiler(" + str + "): " + len + " / " + stop);
+            return len;
         }
+
+        void debug_dump(String str)
+        {
+            System.out.println("profiler(" + str + "): " + get());
+        }
+    }
+
+    static class ProfilerDist
+    {
+        SamplingProfiler() {}
+
+        void debug_start() { prof = new Profiler(); }
+        void debug_stop()
+        {
+            int value = prof.get();
+            n++;
+            sum += value;
+            min = Math.min(min, value);
+            max = Math.max(max, value);
+        }
+
+        void debug_dump(String str)
+        {
+            int mean = sum / n;
+            System.out.println("profiler(" + str + "): " + n
+                    + " [ " + min + ", " + mean + ", " + max + " ]");
+        }
+
+        Profiler prof;
+        int n = 0, sum = 0, min = 100000 + 1, max = 0;
     }
 }
