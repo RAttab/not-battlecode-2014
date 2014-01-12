@@ -5,11 +5,23 @@ import battlecode.common.*;
 class BugPathing
 {
 
-    BugPathing(RobotController rc, MapLocation dest)
+    BugPathing(RobotController rc)
     {
         this.rc = rc;
-        target = dest;
         touched = new boolean[rc.getMapWidth()][rc.getMapHeight()];
+    }
+
+    MapLocation getTarget() { return target; }
+    void setTarget(MapLocation pos)
+    {
+        if (pos.equals(target)) return;
+        target = pos;
+    }
+
+    void reset()
+    {
+        unreachable = false;
+        backtrackOrd = Direction.NONE.ordinal();
     }
 
     /* \todo Always turning to the right isn't that great of an idea but we can
@@ -17,15 +29,16 @@ class BugPathing
     */
     Direction direction()
     {
-        if (unreachable) {
+        if (unreachable || target == null) {
             rc.breakpoint();
             return Direction.NONE;
         }
 
         Direction result = Direction.NONE;
         MapLocation pos = rc.getLocation();
-        Direction targetDir = pos.directionTo(target);
+        if (pos.equals(target)) return result;
 
+        Direction targetDir = pos.directionTo(target);
         int ord = targetDir.ordinal();
 
         for (int i = 8; --i > 0; ord = (ord + 1) % 8) {
@@ -92,7 +105,6 @@ class BugPathing
         rc.sneak(dir);
     }
 
-    int start;
     MapLocation target;
 
     int backtrackOrd = Direction.NONE.ordinal();

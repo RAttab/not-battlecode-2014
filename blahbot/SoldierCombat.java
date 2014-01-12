@@ -2,15 +2,16 @@ package blahbot;
 
 import battlecode.common.*;
 
-public class SoldierMicro
+public class SoldierCombat
 {
 
-    SoldierMicro(RobotController rc)
+    SoldierCombat(RobotController rc, Comm comm)
     {
         this.rc = rc;
+        this.comm = comm;
     }
 
-    boolean isMicro()
+    boolean isCombat()
     {
         visibleEnemies = rc.senseNearbyGameObjects(
                 Robot.class, RobotType.SOLDIER.sensorRadiusSquared, Utils.him);
@@ -128,8 +129,10 @@ public class SoldierMicro
             targetShots = shots;
         }
 
-        centerX /= reachableEnemies.length;
-        centerY /= reachableEnemies.length;
+        MapLocation center = new MapLocation(
+                centerX / reachableEnemies.length,
+                centerY / reachableEnemies.length);
+        comm.spot(center);
 
 
         // Gather some stats about our allies.
@@ -153,7 +156,6 @@ public class SoldierMicro
         // KAMIKAZE!
 
         if (hisHealth > myHealth + attackPw && health <= minHealth) {
-            MapLocation center = new MapLocation(centerX, centerY);
 
             // Well fuck. Our heuristic let us down...
             if (pos == center) {
@@ -163,7 +165,7 @@ public class SoldierMicro
 
             // Move towards the center mass of enemies. Maximize the damage.
             // Why do I feel like a terrorist...?
-            else if (canMoveTo(center, attackRd)) {
+            else if (Utils.canMoveTo(rc, center, attackRd)) {
                 move(pos.directionTo(center));
                 return;
             }
@@ -208,9 +210,9 @@ public class SoldierMicro
             return;
         }
 
-        centerX /= enemies;
-        centerY /= enemies;
-        MapLocation center = new MapLocation(centerX, centerY);
+        MapLocation center = new MapLocation(
+                centerX / enemies, centerY / enemies);
+        comm.spot(center);
 
         Robot[] allies  = rc.senseNearbyGameObjects(
                 Robot.class, RobotType.SOLDIER.sensorRadiusSquared, Utils.me);
@@ -246,28 +248,6 @@ public class SoldierMicro
     }
 
 
-    boolean canMoveTo(MapLocation dest, int max) throws GameActionException
-    {
-        final MapLocation pos = rc.getLocation();
-        if (Math.sqrt(pos.distanceSquaredTo(dest)) > max)
-            return false;
-
-        MapLocation it = rc.getLocation();
-
-        for (int i = 0; i < max; ++i) {
-            it = it.add(pos.directionTo(dest));
-            if (it.equals(dest)) return true;
-
-            if (!rc.senseTerrainTile(it).isTraversableAtHeight(RobotLevel.ON_GROUND))
-                return false;
-
-            if (rc.senseObjectAtLocation(it) != null)
-                return false;
-        }
-
-        return false;
-    }
-
     void move(Direction dir) throws GameActionException
     {
         if (!rc.canMove(dir)) return;
@@ -283,6 +263,7 @@ public class SoldierMicro
 
 
     RobotController rc;
+    Comm comm;
 
     ByteCode.ProfilerDist suicideProf = new ByteCode.ProfilerDist();
     ByteCode.ProfilerDist attackProf = new ByteCode.ProfilerDist();

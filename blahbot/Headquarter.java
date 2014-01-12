@@ -4,7 +4,8 @@ import battlecode.common.*;
 
 public class Headquarter
 {
-    private static boolean spawn(RobotController rc) throws GameActionException
+
+    static boolean spawn() throws GameActionException
     {
         if (rc.senseRobotCount() == GameConstants.MAX_ROBOTS) return false;
 
@@ -20,7 +21,7 @@ public class Headquarter
         return false;
     }
 
-    private static void shoot(RobotController rc) throws GameActionException
+    static void shoot() throws GameActionException
     {
         final int SplashRd = 2;
         final int AttackRd = RobotType.HQ.attackRadiusMaxSquared;
@@ -52,19 +53,28 @@ public class Headquarter
 
     public static void run(RobotController rc) throws GameActionException
     {
-        ProgressQuest pq = new ProgressQuest(rc);
+        Headquarter.rc = rc;
+        Headquarter.comm = new Comm(rc);
+        Headquarter.general = new General(rc, comm);
+        Headquarter.pq = new ProgressQuest(rc);
 
         while (true) {
             ByteCode.Check bcCheck = new ByteCode.Check(rc);
 
-            if (rc.isActive() && spawn(rc));
-            else shoot(rc);
+            if (rc.isActive() && spawn());
+            else shoot();
 
-            pq.update();
+            general.command();
+            // pq.update();
 
             bcCheck.debug_check("Headquarter.end");
             rc.yield();
         }
     }
+
+    static RobotController rc;
+    static Comm comm;
+    static General general;
+    static ProgressQuest pq;
 
 }
