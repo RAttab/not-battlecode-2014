@@ -70,7 +70,7 @@ class Utils
             if (!rc.senseTerrainTile(it).isTraversableAtHeight(RobotLevel.ON_GROUND))
                 return false;
 
-            if (rc.senseObjectAtLocation(it) != null)
+            if (!rc.canSenseSquare(it) || rc.senseObjectAtLocation(it) != null)
                 return false;
         }
 

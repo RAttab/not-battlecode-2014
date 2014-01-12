@@ -54,6 +54,7 @@ public class General
         MapLocation target = furthestVulnerableFrom(pastrs, Utils.hisHq);
         if (target == null) return false;
 
+        System.out.println("general.pastr: " + target.toString());
         comm.setGlobalOrder(target, 4);
         return true;
     }
@@ -78,6 +79,7 @@ public class General
             target = commsDist < spotsDist ? targetComms : targetSpots;
         }
 
+        System.out.println("general.enemies: " + target.toString());
         comm.setGlobalOrder(target, 4);
         return true;
     }
@@ -86,9 +88,7 @@ public class General
     {
         Robot bots[] =
             rc.senseNearbyGameObjects(Robot.class, rallyPoint, 100, Utils.me);
-
-        System.out.println("general.giveOrder: " + bots.length);
-        return bots.length >= 2;
+        return bots.length >= 4;
     }
 
     void command() throws GameActionException

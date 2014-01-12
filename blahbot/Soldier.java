@@ -35,9 +35,10 @@ public class Soldier
         MapLocation[] spots = comm.spots(2);
         final MapLocation pos = rc.getLocation();
 
-        for (int i = 0; i < spots.length; ++i)
+        for (int i = 0; i < spots.length; ++i) {
             if (spots[i] != null && spots[i].distanceSquaredTo(pos) < 400)
                 return spots[i];
+        }
 
         return null;
     }
@@ -57,23 +58,33 @@ public class Soldier
             ByteCode.Check bcCheck = new ByteCode.Check(rc);
 
             if (combat.isCombat()) {
+                System.out.println("soldier.combat");
                 combat.exterminate();
-                pathing.reset();
+                pathing.setTarget(null);
             }
 
             else {
                 MapLocation pos;
 
-                if ((pos = reinforce()) != null)
+                if ((pos = reinforce()) != null) {
                     pathing.setTarget(pos);
+                    System.out.println("soldier.reinforce");
+                }
 
-                else if (comm.hasGlobalOrder() && (pos = comm.globalOrderPos()) != null)
+                else if (comm.hasGlobalOrder() && (pos = comm.globalOrderPos()) != null) {
                     pathing.setTarget(pos);
+                    System.out.println("soldier.orders: " + pos.toString());
+                }
 
-                else if (pathing.getTarget() == null)
-                    pathing.setTarget(comm.getRallyPoint());
+                else if (pathing.getTarget() == null) {
+                    pathing.setTarget(pos = comm.getRallyPoint());
+                    System.out.println("soldier.rally: " + pos.toString());
+                }
 
-                move(pathing.direction());
+                Direction dir = pathing.direction();
+                System.out.println("soldier.move: " +
+                        pathing.getTarget() + " -> " + dir.toString());
+                move(dir);
             }
 
             debug_dump();

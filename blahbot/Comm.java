@@ -74,9 +74,11 @@ public class Comm
 
             if (rc.readBroadcast(offset + 0) <= minRound) continue;
 
-            result[j++] = new MapLocation(
-                    rc.readBroadcast(offset + 1),
-                    rc.readBroadcast(offset + 2));
+            int x = rc.readBroadcast(offset + 1);
+            int y = rc.readBroadcast(offset + 2);
+            if (x == 0 && y == 0) continue;
+
+            result[j++] = new MapLocation(x, y);
         }
 
         return result;

@@ -132,6 +132,7 @@ public class SoldierCombat
         MapLocation center = new MapLocation(
                 centerX / reachableEnemies.length,
                 centerY / reachableEnemies.length);
+        System.out.println("combat.attack.spot: " + center.toString());
         comm.spot(center);
 
 
@@ -212,6 +213,7 @@ public class SoldierCombat
 
         MapLocation center = new MapLocation(
                 centerX / enemies, centerY / enemies);
+        System.out.println("combat.visible.spot: " + center.toString());
         comm.spot(center);
 
         Robot[] allies  = rc.senseNearbyGameObjects(

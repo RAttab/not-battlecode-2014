@@ -8,20 +8,21 @@ class BugPathing
     BugPathing(RobotController rc)
     {
         this.rc = rc;
-        touched = new boolean[rc.getMapWidth()][rc.getMapHeight()];
     }
 
     MapLocation getTarget() { return target; }
     void setTarget(MapLocation pos)
     {
+        if (pos == null) {
+            target = null;
+            return;
+        }
         if (pos.equals(target)) return;
-        target = pos;
-    }
 
-    void reset()
-    {
+        target = pos;
         unreachable = false;
         backtrackOrd = Direction.NONE.ordinal();
+        touched = new boolean[rc.getMapWidth()][rc.getMapHeight()];
     }
 
     /* \todo Always turning to the right isn't that great of an idea but we can
@@ -31,12 +32,16 @@ class BugPathing
     {
         if (unreachable || target == null) {
             rc.breakpoint();
+            System.out.println("bug.direction: " + unreachable + " " + target == null);
             return Direction.NONE;
         }
 
         Direction result = Direction.NONE;
         MapLocation pos = rc.getLocation();
-        if (pos.equals(target)) return result;
+        if (pos.equals(target)) {
+            System.out.println("bug.direction: " + pos.toString() + " == " + target.toString());
+            return result;
+        }
 
         Direction targetDir = pos.directionTo(target);
         int ord = targetDir.ordinal();
@@ -52,10 +57,14 @@ class BugPathing
         }
 
         // got stuck.
-        if (result == Direction.NONE) return result;
+        if (result == Direction.NONE) {
+            System.out.println("bug.direction: stuck");
+            return result;
+        }
 
         MapLocation newPos = pos.add(result);
         if (touched[newPos.x][newPos.y]) {
+            System.out.println("bug.direction: unreachable");
             unreachable = true;
             return Direction.NONE;
         }
