@@ -2,7 +2,7 @@ package blahbot;
 
 import battlecode.common.*;
 
-public class SoldierCombat
+class SoldierCombat
 {
 
     SoldierCombat(RobotController rc, Comm comm)
@@ -183,7 +183,7 @@ public class SoldierCombat
 
     // \todo Don't step into attack range and give them first shot.
     Robot[] visibleEnemies;
-    void visible() throws GameActionException
+    MapLocation visible() throws GameActionException
     {
         final MapLocation pos = rc.getLocation();
 
@@ -206,10 +206,8 @@ public class SoldierCombat
         }
 
         // Defense-less towers? How nice of you!
-        if (enemies == 0) {
-            move(pos.directionTo(base.location));
-            return;
-        }
+        if (enemies == 0)
+            return base.location;
 
         MapLocation center = new MapLocation(
                 centerX / enemies, centerY / enemies);
@@ -219,12 +217,14 @@ public class SoldierCombat
         Robot[] allies  = rc.senseNearbyGameObjects(
                 Robot.class, RobotType.SOLDIER.sensorRadiusSquared, Utils.me);
 
-        if (enemies <= allies.length + 1) move(pos.directionTo(center));
-        else move(center.directionTo(pos));
+        if (enemies <= allies.length + 1) return center;
+
+        // Outnumbered and outguned. Running away sounds like a good idea.
+        return comm.getRallyPoint();
     }
 
 
-    public void exterminate() throws GameActionException
+    MapLocation exterminate() throws GameActionException
     {
         Robot[] suicideEnemies = rc.senseNearbyGameObjects(
                 Robot.class, Utils.SelfDestructRangeSq, Utils.him);
@@ -232,7 +232,7 @@ public class SoldierCombat
             suicideProf.debug_start();
             suicide(suicideEnemies);
             suicideProf.debug_stop();
-            return;
+            return null;
         }
 
         Robot[] reachableEnemies = rc.senseNearbyGameObjects(
@@ -241,12 +241,13 @@ public class SoldierCombat
             attackProf.debug_start();
             attack(reachableEnemies);
             attackProf.debug_stop();
-            return;
+            return null;
         }
 
         visibleProf.debug_start();
-        visible();
+        MapLocation target = visible();
         visibleProf.debug_stop();
+        return target;
     }
 
 

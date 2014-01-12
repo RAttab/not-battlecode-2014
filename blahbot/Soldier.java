@@ -59,8 +59,9 @@ public class Soldier
 
             if (combat.isCombat()) {
                 System.out.println("soldier.combat");
-                combat.exterminate();
-                pathing.setTarget(null);
+                pathing.setTarget(combat.exterminate());
+                if (pathing.getTarget() != null)
+                    move(pathing.direction());
             }
 
             else {
