@@ -84,17 +84,4 @@ public class Utils
         return rc.senseNearbyGameObjects(
                 Robot.class, rc.getType().sensorRadiusSquared, rc.getTeam());
     }
-
-    public static printCost(Executable e, Object data, String methodName){
-        System.out.println("Profiling " +  + "...");
-        int start = Clock.getBytecodeNum();
-        e.execute(data);
-        int cost = Clock.getBytecodeNum();
-        System.out.println("method '" + methodName + "' cost " + cost + " bytecodes.")
-    }
-}
-
-public interface Executable <ReturnType>
-{
-    public ReturnType execute(Object method);
 }

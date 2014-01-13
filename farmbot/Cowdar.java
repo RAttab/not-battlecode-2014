@@ -7,9 +7,9 @@ public class Cowdar
 {
     public static Utils utils;
     public static RobotController rc;
-    public static double[] x_vec = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0];
-    public static double[] y_vec = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0];
-    public static double[] weights = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0];
+    public static double[] x_vec = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+    public static double[] y_vec = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+    public static double[] weights = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
     public static int lastTurnUpdated = 0;
     public static int lastIndex = -1;
 
@@ -22,6 +22,8 @@ public class Cowdar
     public static void update(int maxByteCodes) {
         if (lastTurnUpdated == Clock.getRoundNum())
             return;
+
+        int bcStart = Clock.getRoundNum();
 
         int i = (lastIndex + 1) % 10;
         lastTurnUpdated = Clock.getRoundNum();
