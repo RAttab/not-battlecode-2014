@@ -54,7 +54,7 @@ public class Comm
     void spot(MapLocation pos) throws GameActionException
     {
         int index = rc.readBroadcast(SpotPos + 0) + 1;
-        int offset = 1 + 3 * (index % MaxSpots);
+        int offset = SpotPos + 1 + 3 * (index % MaxSpots);
 
         rc.broadcast(offset + 0, Clock.getRoundNum());
         rc.broadcast(offset + 1, pos.x);
