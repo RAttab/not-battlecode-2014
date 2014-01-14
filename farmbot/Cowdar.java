@@ -13,8 +13,10 @@ class CowSpot
 
         // TODO: incorporate distance to HQ and EnemyHQ
         this.loc = loc;
-        System.out.println("bestSpot: " + loc.x + "," + loc.y);
-        if (rc.senseTerrainTile(loc) == TerrainTile.VOID) {
+        // System.out.println("CowSpot constructor called with loc: " + loc.x + "," + loc.y);
+        // System.out.println(rc);
+        if (rc.senseTerrainTile(loc) == TerrainTile.OFF_MAP 
+                    || rc.senseTerrainTile(loc) == TerrainTile.VOID) {
             density = -100;
         } else {
             density = Cowdar.cowSexSum(loc.x - 5, loc.y - 5, loc.x + 5, loc.y + 5);
@@ -42,9 +44,9 @@ public class Cowdar
     public static MapLocation hqLoc;
     public static Direction awayFromEnemyHq;
 
-    public static void init(RobotController rc) throws GameActionException
+    public static void init(RobotController _rc) throws GameActionException
     {
-        rc = rc;
+        rc = _rc;
 
         cowSex = rc.senseCowGrowth();
         hqLoc = rc.senseHQLocation();
@@ -53,7 +55,6 @@ public class Cowdar
         awayFromEnemyHq = hqLoc.directionTo(rc.senseEnemyHQLocation()).opposite();
 
         bestSpot = new CowSpot(rc, getFirstLoc());
-        System.out.println("bestSpot: " + bestSpot.loc.x + "," + bestSpot.loc.y);
 
     }
 
@@ -74,9 +75,13 @@ public class Cowdar
 
         while (Clock.getBytecodeNum() - start < byteCodeLimit + 400){
             loc = new MapLocation(spot.loc.x + Utils.rand_5(), spot.loc.y + Utils.rand_5());
+            
+            // System.out.println("loc: " + loc.x + " " + loc.y);
             spot = new CowSpot(rc, loc);
+            // System.out.println("spot.loc: " + spot.loc.x + " " + spot.loc.y);
             if (spot.density > bestSpot.density)
                 bestSpot = spot;
+
         }
         rc.breakpoint();
     }

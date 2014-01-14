@@ -36,10 +36,12 @@ public class Soldier
 
                 rc.setIndicatorString(0, "Goalcoord = (" + goal.x + ", " + goal.y + ").");
 
-                if (rc.sensePastrLocations(rc.getTeam()).length == 0) {
-                    if (rc.getLocation() == goal)
+                if (rc.sensePastrLocations(rc.getTeam()).length < 1) {
+                    if (myLoc.distanceSquaredTo(goal) < 1){
+                        rc.setIndicatorString(1, "Got milk?");
                         rc.construct(RobotType.PASTR);
-                    else {
+                    } else {
+                        rc.setIndicatorString(1, "Find bovine.");
                         Direction nextDir = move(rc, myLoc, goal);
                         if (nextDir != Direction.NONE){
                             rc.sneak(nextDir);
@@ -47,8 +49,10 @@ public class Soldier
                     }
                 } else {
                     if (Utils.distTwoPoints(goal, myLoc) < 5){
+                        rc.setIndicatorString(1, "Everybody's talkin' at me...");
                         farm();
                     } else {
+                        rc.setIndicatorString(1, "Donde esta la mancha?");
                         Direction nextDir = move(rc, myLoc, goal);
                         if (nextDir != Direction.NONE){
                             rc.sneak(nextDir);
