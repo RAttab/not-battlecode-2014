@@ -39,7 +39,7 @@ public class General
         if (pastrs.length == 0) {
             final int BcLimit = 8000;
 
-            if (Clock.getRoundNum() < 8 && Clock.getBytecodeNum() < BcLimit)
+            if (Clock.getRoundNum() < 12 && Clock.getBytecodeNum() < BcLimit)
                 Cowdar.search(BcLimit - Clock.getBytecodeNum());
 
             rallyPoint = Cowdar.bestSpot.loc;
