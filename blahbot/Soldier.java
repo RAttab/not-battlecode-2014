@@ -66,10 +66,16 @@ public class Soldier
 
             else {
                 MapLocation pos;
+                MapLocation myPos = rc.getLocation();
 
                 if ((pos = reinforce()) != null) {
                     pathing.setTarget(pos);
                     System.out.println("soldier.reinforce");
+                }
+
+                else if (rc.getLocation().equals(comm.getRallyPoint())) {
+                    rc.construct(RobotType.PASTR);
+                    System.out.println("soldier.construct");
                 }
 
                 else if (comm.hasGlobalOrder() && (pos = comm.globalOrderPos()) != null) {
@@ -77,14 +83,14 @@ public class Soldier
                     System.out.println("soldier.orders: " + pos.toString());
                 }
 
-                else if (pathing.getTarget() == null) {
+                else if (pathing.getTarget() == null || myPos.equals(pathing.getTarget())) {
                     pathing.setTarget(pos = comm.getRallyPoint());
                     System.out.println("soldier.rally: " + pos.toString());
                 }
 
                 Direction dir = pathing.direction();
                 System.out.println("soldier.move: " +
-                        pathing.getTarget() + " -> " + dir.toString());
+                        myPos + ", " + pathing.getTarget() + " -> " + dir.toString());
                 move(dir);
             }
 
