@@ -253,6 +253,7 @@ class SoldierCombat
 
     void move(Direction dir) throws GameActionException
     {
+        if (dir == Direction.OMNI || dir == Direction.NONE) return;
         if (!rc.canMove(dir)) return;
         rc.move(dir);
     }
