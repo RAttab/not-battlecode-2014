@@ -12,6 +12,7 @@ class CowSpot
         // Note: Do not create a CowSpot closer than 5 tiles from the map edge!
 
         // TODO: incorporate distance to HQ and EnemyHQ
+
         this.loc = loc;
         // System.out.println("CowSpot constructor called with loc: " + loc.x + "," + loc.y);
         // System.out.println(rc);
@@ -85,7 +86,9 @@ public class Cowdar
         MapLocation loc;
         CowSpot spot = bestSpot;
 
-        while (Clock.getBytecodeNum() - start < byteCodeLimit + 400){
+        while (Clock.getBytecodeNum() - start < byteCodeLimit + 800){
+            // int start_debug = Clock.getBytecodeNum();
+
             loc = new MapLocation(spot.loc.x + Utils.rand_5(), spot.loc.y + Utils.rand_5());
             
             // System.out.println("loc: " + loc.x + " " + loc.y);
@@ -96,6 +99,8 @@ public class Cowdar
                                     + ") ~ " + spot.density + ">" + bestSpot.density);
                 bestSpot = spot;
             }
+
+            // System.out.println("loop used " + (Clock.getBytecodeNum() - start_debug) + " bc");
 
         }
         rc.breakpoint();
