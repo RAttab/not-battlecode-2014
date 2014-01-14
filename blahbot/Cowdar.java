@@ -25,7 +25,7 @@ class CowSpot
                 MapLocation next = new MapLocation(loc.x + Utils.samples_5[i], 
                                                     loc.y + Utils.samples_5[i+10]);
                 if (rc.senseTerrainTile(next) == TerrainTile.VOID)
-                    density -= Weights.COWDAR_WALL_PENALTY;
+                    density -= 4;
             }
         }
     }
