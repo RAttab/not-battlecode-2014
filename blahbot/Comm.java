@@ -70,7 +70,7 @@ public class Comm
 
         int minRound = Clock.getRoundNum() - ttl;
         for (int i = 0, j = 0; i < n; ++i) {
-            int offset = 1 + 3 * i;
+            int offset = SpotPos + 1 + 3 * i;
 
             if (rc.readBroadcast(offset + 0) <= minRound) continue;
 
