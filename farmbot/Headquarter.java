@@ -51,7 +51,7 @@ public class Headquarter
     public static void run(RobotController rc) throws GameActionException
     {
         Direction enemyHQDir = rc.getLocation().directionTo(rc.senseEnemyHQLocation());
-        Cowdar.init(rc, rc.getLocation());
+        Cowdar.init(rc);
 
         while (true) {
             ByteCode.Check bcCheck = new ByteCode.Check(rc);
@@ -59,9 +59,9 @@ public class Headquarter
             if (rc.isActive()) spawn(rc);
             else shoot(rc);
 
-            if (Clock.getBytecodeNum() < 9000) {
-                Cowdar.search(9000 - Clock.getBytecodeNum());
-            }
+            // if (Clock.getBytecodeNum() < 9000) {
+            //     Cowdar.search(9000 - Clock.getBytecodeNum());
+            // }
 
             if (Clock.getRoundNum() > 2) {
                 rc.broadcast(PASTRCHAN, 1000*Cowdar.bestSpot.loc.y + Cowdar.bestSpot.loc.x);

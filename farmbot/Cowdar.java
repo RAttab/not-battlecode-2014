@@ -12,7 +12,8 @@ class CowSpot
         // Note: Do not create a CowSpot closer than 5 tiles from the map edge!
 
         // TODO: incorporate distance to HQ and EnemyHQ
-        loc = loc;
+        this.loc = loc;
+        System.out.println("bestSpot: " + loc.x + "," + loc.y);
         if (rc.senseTerrainTile(loc) == TerrainTile.VOID) {
             density = -100;
         } else {
@@ -41,7 +42,7 @@ public class Cowdar
     public static MapLocation hqLoc;
     public static Direction awayFromEnemyHq;
 
-    public static void init(RobotController rc, MapLocation hqLoc) throws GameActionException
+    public static void init(RobotController rc) throws GameActionException
     {
         rc = rc;
 
@@ -52,7 +53,7 @@ public class Cowdar
         awayFromEnemyHq = hqLoc.directionTo(rc.senseEnemyHQLocation()).opposite();
 
         bestSpot = new CowSpot(rc, getFirstLoc());
-
+        System.out.println("bestSpot: " + bestSpot.loc.x + "," + bestSpot.loc.y);
 
     }
 
@@ -77,6 +78,7 @@ public class Cowdar
             if (spot.density > bestSpot.density)
                 bestSpot = spot;
         }
+        rc.breakpoint();
     }
 
     public static MapLocation getFirstLoc() {

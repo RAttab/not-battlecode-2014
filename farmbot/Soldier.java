@@ -31,14 +31,29 @@ public class Soldier
             if (myState == State.MOVING) {
                 int goalCoord = rc.readBroadcast(Headquarter.PASTRCHAN);
                 int y = goalCoord / 1000;
-                goal = new MapLocation(goalCoord - y, y);
 
-                if (Utils.distTwoPoints(goal, myLoc) < 2){
-                    rc.construct(RobotType.PASTR);
+                goal = new MapLocation(goalCoord - (y*1000), y);
+
+                rc.setIndicatorString(0, "Goalcoord = (" + goal.x + ", " + goal.y + ").");
+
+                if (rc.sensePastrLocations(rc.getTeam()).length == 0) {
+                    if (rc.getLocation() == goal)
+                        rc.construct(RobotType.PASTR);
+                    else {
+                        Direction nextDir = move(rc, myLoc, goal);
+                        if (nextDir != Direction.NONE){
+                            rc.sneak(nextDir);
+                        }
+                    }
                 } else {
-                    Direction nextDir = move(rc, myLoc, goal);
-                    if (nextDir != Direction.NONE)
-                        rc.move(nextDir);
+                    if (Utils.distTwoPoints(goal, myLoc) < 5){
+                        farm();
+                    } else {
+                        Direction nextDir = move(rc, myLoc, goal);
+                        if (nextDir != Direction.NONE){
+                            rc.sneak(nextDir);
+                        }
+                    }
                 }
             }
 
@@ -46,14 +61,20 @@ public class Soldier
             rc.yield();
         }
     }
+    public static void farm(){
 
+    }
 
     public static Direction move(RobotController rc, MapLocation myLoc, MapLocation dest) 
     {
         // TODO: improve this
         Direction dir = myLoc.directionTo(dest);
+
+        if (dir == Direction.OMNI)
+            return Direction.NONE;
+
         // Bug
-        for (int i=8; --i > 0; ){
+        for (int i=8; i-- > 0; ){
             if (rc.canMove(dir))
                 return dir;
             dir = dir.rotateRight();
