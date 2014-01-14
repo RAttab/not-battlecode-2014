@@ -94,9 +94,14 @@ class SoldierCombat
         RobotInfo nearest = null;
         int nearestDist = 0;
 
+        boolean hasHq = false;
+
         for (int i = reachableEnemies.length; i-- > 0;) {
             RobotInfo info = rc.senseRobotInfo(reachableEnemies[i]);
-            if (info.type == RobotType.HQ) continue;
+            if (info.type == RobotType.HQ) {
+                hasHq = true;
+                continue;
+            }
 
             centerX += info.location.x;
             centerY += info.location.y;
@@ -136,6 +141,9 @@ class SoldierCombat
             target = info;
             targetShots = shots;
         }
+
+        // \todo Need something smarter.
+        if (hasHq && reachableEnemies.length == 1) return;
 
         MapLocation center = new MapLocation(
                 centerX / reachableEnemies.length,
