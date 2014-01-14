@@ -37,7 +37,7 @@ public class General
         MapLocation pastrs[] = rc.sensePastrLocations(Utils.me);
 
         if (pastrs.length == 0) {
-            final int BcLimit = 7000;
+            final int BcLimit = 8000;
 
             if (Clock.getRoundNum() < 8 && Clock.getBytecodeNum() < BcLimit)
                 Cowdar.search(BcLimit - Clock.getBytecodeNum());
