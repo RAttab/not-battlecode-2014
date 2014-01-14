@@ -52,6 +52,9 @@ class BugPathing
             Direction dir = Utils.dirs[ord];
             if (!rc.canMove(dir)) continue;
 
+            MapLocation newPos = pos.add(dir);
+            if (touched[newPos.x][newPos.y]) continue;
+
             result = dir;
             break;
         }
@@ -62,12 +65,13 @@ class BugPathing
             return result;
         }
 
-        MapLocation newPos = pos.add(result);
-        if (touched[newPos.x][newPos.y]) {
-            System.out.println("bug.direction: unreachable");
-            unreachable = true;
-            return Direction.NONE;
-        }
+        // \todo this is wrong. need to rethink.
+        // MapLocation newPos = pos.add(result);
+        // if (touched[newPos.x][newPos.y]) {
+        //     System.out.println("bug.direction: unreachable");
+        //     unreachable = true;
+        //     return Direction.NONE;
+        // }
 
         touched[pos.x][pos.y] = true;
         backtrackOrd = result.opposite().ordinal();
