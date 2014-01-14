@@ -57,7 +57,7 @@ public class General
             rallyPoint = rc.getLocation().add(rallyDir, 2);
         }
 
-        System.out.println("general.rally: " + rallyPoint.toString());
+        // System.out.println("general.rally: " + rallyPoint.toString());
         comm.setRallyPoint(rallyPoint);
     }
 
@@ -67,7 +67,7 @@ public class General
         MapLocation target = furthestVulnerableFrom(pastrs, Utils.hisHq);
         if (target == null) return false;
 
-        System.out.println("general.pastr: " + target.toString());
+        // System.out.println("general.pastr: " + target.toString());
         comm.setGlobalOrder(target, 4);
         return true;
     }
@@ -92,7 +92,7 @@ public class General
             target = commsDist < spotsDist ? targetComms : targetSpots;
         }
 
-        System.out.println("general.enemies: " + target.toString());
+        // System.out.println("general.enemies: " + target.toString());
         comm.setGlobalOrder(target, 4);
         return true;
     }
