@@ -75,7 +75,10 @@ public class ByteCode
 
         void debug_dump(String str)
         {
-            int mean = sum / n;
+            if (n==0)
+                int mean = 0
+            else
+                int mean = sum / n;
             System.out.println("profiler(" + str + "): " + n
                     + " [ " + min + ", " + mean + ", " + max + " ]");
         }
