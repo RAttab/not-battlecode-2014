@@ -32,14 +32,14 @@ class BugPathing
     {
         if (unreachable || target == null) {
             rc.breakpoint();
-            System.out.println("bug.direction: " + unreachable + " " + target == null);
+            // System.out.println("bug.direction: " + unreachable + " " + target == null);
             return Direction.NONE;
         }
 
         Direction result = Direction.NONE;
         MapLocation pos = rc.getLocation();
         if (pos.equals(target)) {
-            System.out.println("bug.direction: " + pos.toString() + " == " + target.toString());
+            // System.out.println("bug.direction: " + pos.toString() + " == " + target.toString());
             return result;
         }
 
@@ -61,7 +61,7 @@ class BugPathing
 
         // got stuck.
         if (result == Direction.NONE) {
-            System.out.println("bug.direction: stuck");
+            // System.out.println("bug.direction: stuck");
             return result;
         }
 
@@ -90,7 +90,7 @@ class BugPathing
     void move(Direction dir) throws GameActionException
     {
         if (dir == Direction.NONE) {
-            System.out.println("ERROR: Move to NONE");
+            // System.out.println("ERROR: Move to NONE");
             rc.breakpoint();
             return;
         }
@@ -110,7 +110,7 @@ class BugPathing
     void sneak(Direction dir) throws GameActionException
     {
         if (dir == Direction.NONE) {
-            System.out.println("ERROR: Sneak to NONE");
+            // System.out.println("ERROR: Sneak to NONE");
             rc.breakpoint();
             return;
         }
