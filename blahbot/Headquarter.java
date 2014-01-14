@@ -57,6 +57,7 @@ public class Headquarter
         Headquarter.comm = new Comm(rc);
         Headquarter.general = new General(rc, comm);
         Headquarter.pq = new ProgressQuest(rc);
+        Cowdar.init(rc);
 
         while (true) {
             ByteCode.Check bcCheck = new ByteCode.Check(rc);
