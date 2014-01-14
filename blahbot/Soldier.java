@@ -57,7 +57,7 @@ public class Soldier
 
             ByteCode.Check bcCheck = new ByteCode.Check(rc);
 
-            if (combat.isCombat()) {
+            if (combat.isCombat() == SoldierCombat.CombatState.YES) {
                 rc.setIndicatorString(0, "soldier.combat");
                 pathing.setTarget(combat.exterminate());
                 if (pathing.getTarget() != null)

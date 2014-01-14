@@ -4,6 +4,7 @@ import battlecode.common.*;
 
 class SoldierCombat
 {
+    public enum CombatState {YES, NO, JUST_HQ};
 
     SoldierCombat(RobotController rc, Comm comm)
     {
@@ -11,12 +12,19 @@ class SoldierCombat
         this.comm = comm;
     }
 
-    boolean isCombat()
+    CombatState isCombat() throws GameActionException
     {
         visibleEnemies = rc.senseNearbyGameObjects(
                 Robot.class, RobotType.SOLDIER.sensorRadiusSquared, Utils.him);
 
-        return visibleEnemies.length > 0;
+        if (visibleEnemies.length == 0) {
+            return CombatState.NO;
+        } else if (visibleEnemies.length == 1) {
+            if (rc.senseRobotInfo(visibleEnemies[0]).type == RobotType.HQ)
+                return CombatState.JUST_HQ;
+            return CombatState.YES;
+        }
+        return CombatState.YES;
     }
 
 
