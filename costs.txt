@@ -1,9 +1,15 @@
+260 random/nextGaussian()
+
 100 battlecode/common/RobotController/senseTeamMilkQuantity
 100 battlecode/common/RobotController/sensePastrLocations
 100 battlecode/common/RobotController/senseNearbyGameObjects
 100 battlecode/common/RobotController/senseCowGrowth
 100 battlecode/common/RobotController/senseBroadcastingRobots
 100 battlecode/common/RobotController/senseBroadcastingRobotLocations
+
+70 random/nextDouble()
+
+56 random/nextInt(int n)
 
 50 java/lang/String/contains
 50 java/lang/StrictMath/tanh
@@ -38,6 +44,8 @@
 50 java/lang/Math/atan
 50 java/lang/Math/asin
 50 java/lang/Math/acos
+
+33 random/nextInt()
 
 30 java/lang/String/startsWith
 30 java/lang/String/replace
@@ -92,6 +100,8 @@
 15 battlecode/common/RobotController/canSenseSquare
 15 battlecode/common/RobotController/canSenseObject
 15 battlecode/common/RobotController/canAttackSquare
+
+14 utils/rand_5()
 
 10 java/lang/StringBuilder/append
 10 java/lang/StringBuffer/append
