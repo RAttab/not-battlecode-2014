@@ -59,11 +59,11 @@ public class Headquarter
             if (rc.isActive()) spawn(rc);
             else shoot(rc);
 
-            if (Clock.getBytecodeNum() < 9000) {
-                Cowdar.search(9000 - Clock.getBytecodeNum());
-            }
-
-            if (Clock.getRoundNum() > 3) {
+            if (Clock.getRoundNum() < 8) {
+                if (Clock.getBytecodeNum() < 9000) {
+                    Cowdar.search(9000 - Clock.getBytecodeNum());
+                }
+            } else { 
                 rc.broadcast(PASTRCHAN, 1000*Cowdar.bestSpot.loc.y + Cowdar.bestSpot.loc.x);
             }
 

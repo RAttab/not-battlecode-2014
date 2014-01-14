@@ -22,7 +22,8 @@ class CowSpot
             density = Cowdar.cowSexSum(loc.x - 5, loc.y - 5, loc.x + 5, loc.y + 5);
 
             for (int i=8; i-- > 0;) {
-                MapLocation next = new MapLocation(loc.x + Utils.rand_5(), loc.y + Utils.rand_5());
+                MapLocation next = new MapLocation(loc.x + Utils.samples_5[i], 
+                                                    loc.y + Utils.samples_5[i+10]);
                 if (rc.senseTerrainTile(next) == TerrainTile.VOID)
                     density -= Weights.COWDAR_WALL_PENALTY;
             }
@@ -59,6 +60,17 @@ public class Cowdar
     }
 
     public static double cowSexSum(int xmin, int ymin, int xmax, int ymax) {
+        
+        if (xmin < 0)
+            xmin = 0;
+        else if (xmax >= mapWidth)
+            xmax = mapWidth - 1;
+        
+        if (ymin < 0)
+            ymin = 0;
+        else if (ymax >= mapHeight)
+            ymax = mapHeight - 1;
+
         double sum = 0.0;
         for (;xmin++ < xmax;) {
             for (;ymin++ < ymax;) {
@@ -79,8 +91,11 @@ public class Cowdar
             // System.out.println("loc: " + loc.x + " " + loc.y);
             spot = new CowSpot(rc, loc);
             // System.out.println("spot.loc: " + spot.loc.x + " " + spot.loc.y);
-            if (spot.density > bestSpot.density)
+            if (spot.density > bestSpot.density){
+                System.out.println("New best spot found: (" + spot.loc.x + " " + spot.loc.y 
+                                    + ") ~ " + spot.density + ">" + bestSpot.density);
                 bestSpot = spot;
+            }
 
         }
         rc.breakpoint();

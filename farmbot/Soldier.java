@@ -33,29 +33,42 @@ public class Soldier
                 int y = goalCoord / 1000;
 
                 goal = new MapLocation(goalCoord - (y*1000), y);
+                int distSq = myLoc.distanceSquaredTo(goal);
 
-                rc.setIndicatorString(0, "Goalcoord = (" + goal.x + ", " + goal.y + ").");
+                rc.setIndicatorString(0, "Goalcoord = (" + goal.x + ", " + goal.y + "), distSq = " + distSq);
 
                 if (rc.sensePastrLocations(rc.getTeam()).length < 1) {
-                    if (myLoc.distanceSquaredTo(goal) < 1){
+                    if (distSq < 1){
                         rc.setIndicatorString(1, "Got milk?");
                         rc.construct(RobotType.PASTR);
-                    } else {
-                        rc.setIndicatorString(1, "Find bovine.");
+                    } else if (distSq < 25) {
+                        rc.setIndicatorString(1, "Shhhh.....");
                         Direction nextDir = move(rc, myLoc, goal);
                         if (nextDir != Direction.NONE){
                             rc.sneak(nextDir);
                         }
+                    } else {
+                        rc.setIndicatorString(1, "Find bovine.");
+                        Direction nextDir = move(rc, myLoc, goal);
+                        if (nextDir != Direction.NONE){
+                            rc.move(nextDir);
+                        }
                     }
                 } else {
-                    if (Utils.distTwoPoints(goal, myLoc) < 5){
+                    if (distSq < 16){
                         rc.setIndicatorString(1, "Everybody's talkin' at me...");
                         farm();
+                    } else if (distSq < 25) {
+                        rc.setIndicatorString(1, "Ya esta!");
+                        Direction nextDir = move(rc, myLoc, goal);
+                        if (nextDir != Direction.NONE){
+                            rc.sneak(nextDir);
+                        }
                     } else {
                         rc.setIndicatorString(1, "Donde esta la mancha?");
                         Direction nextDir = move(rc, myLoc, goal);
                         if (nextDir != Direction.NONE){
-                            rc.sneak(nextDir);
+                            rc.move(nextDir);
                         }
                     }
                 }
