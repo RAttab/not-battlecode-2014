@@ -37,8 +37,10 @@ public class General
         MapLocation pastrs[] = rc.sensePastrLocations(Utils.me);
 
         if (pastrs.length == 0) {
-            if (Clock.getRoundNum() < 8 && Clock.getBytecodeNum() < 9000)
-                Cowdar.search(9000 - Clock.getBytecodeNum());
+            final int BcLimit = 7000;
+
+            if (Clock.getRoundNum() < 8 && Clock.getBytecodeNum() < BcLimit)
+                Cowdar.search(BcLimit - Clock.getBytecodeNum());
 
             rallyPoint = Cowdar.bestSpot.loc;
         }
