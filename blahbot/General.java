@@ -37,27 +37,23 @@ public class General
         MapLocation pastrs[] = rc.sensePastrLocations(Utils.me);
 
         if (pastrs.length == 0) {
-            if (Clock.getRoundNum() < 8) {
-                if (Clock.getBytecodeNum() < 9000) {
-                    Cowdar.search(9000 - Clock.getBytecodeNum());
-                }
-            }
+            if (Clock.getRoundNum() < 8 && Clock.getBytecodeNum() < 9000)
+                Cowdar.search(9000 - Clock.getBytecodeNum());
 
             rallyPoint = Cowdar.bestSpot.loc;
-            
-        } else {
+        }
+
+        else {
             if (pastrs.length == lastLength) return;
             lastLength = pastrs.length;
 
             rallyPoint = furthestVulnerableFrom(pastrs, Utils.myHq);
-            if (rallyPoint == null) {
-                Direction rallyDir = Utils.myHq.directionTo(Utils.hisHq);
-                rallyPoint = rc.getLocation().add(rallyDir, 2);
-            }
-
         }
 
-
+        if (rallyPoint == null) {
+            Direction rallyDir = Utils.myHq.directionTo(Utils.hisHq);
+            rallyPoint = rc.getLocation().add(rallyDir, 2);
+        }
 
         System.out.println("general.rally: " + rallyPoint.toString());
         comm.setRallyPoint(rallyPoint);
