@@ -58,7 +58,7 @@ public class Soldier
             ByteCode.Check bcCheck = new ByteCode.Check(rc);
 
             if (combat.isCombat()) {
-                System.out.println("soldier.combat");
+                rc.setIndicatorString(0, "soldier.combat");
                 pathing.setTarget(combat.exterminate());
                 if (pathing.getTarget() != null)
                     move(pathing.direction());
@@ -70,26 +70,26 @@ public class Soldier
 
                 if ((pos = reinforce()) != null) {
                     pathing.setTarget(pos);
-                    System.out.println("soldier.reinforce");
+                    rc.setIndicatorString(0, "soldier.reinforce");
                 }
 
                 else if (rc.getLocation().equals(comm.getRallyPoint())) {
                     rc.construct(RobotType.PASTR);
-                    System.out.println("soldier.construct");
+                    rc.setIndicatorString(0, "soldier.construct");
                 }
 
                 else if (comm.hasGlobalOrder() && (pos = comm.globalOrderPos()) != null) {
                     pathing.setTarget(pos);
-                    System.out.println("soldier.orders: " + pos.toString());
+                    rc.setIndicatorString(0, "soldier.orders: " + pos.toString());
                 }
 
                 else if (pathing.getTarget() == null || myPos.equals(pathing.getTarget())) {
                     pathing.setTarget(pos = comm.getRallyPoint());
-                    System.out.println("soldier.rally: " + pos.toString());
+                    rc.setIndicatorString(0, "soldier.rally: " + pos.toString());
                 }
 
                 Direction dir = pathing.direction();
-                System.out.println("soldier.move: " +
+                rc.setIndicatorString(0, "soldier.move: " +
                         myPos + ", " + pathing.getTarget() + " -> " + dir.toString());
                 move(dir);
             }
