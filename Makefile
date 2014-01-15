@@ -7,9 +7,9 @@
 OS := $(shell uname)
 
 ifeq ($(OS), Darwin) # Mac OS X
-	INSTALL_DIR ?= /Applications/Battlecode2013
+	INSTALL_DIR ?= /Applications/Battlecode2014
 else
-	INSTALL_DIR ?= ~/Battlecode2013
+	INSTALL_DIR ?= ~/Battlecode2014
 endif
 
 #INSTALL_DIR := ./tmp
