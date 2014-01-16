@@ -79,7 +79,7 @@
                         <select name="mapName">
                             <option value="">- Map Name -</option>
                             %for mapName in mapNames:
-                                <option>{{ mapNames['name'] }}</option>
+                                <option>{{ mapName['name'] }}</option>
                             %end
                         </select>
                     </th>
