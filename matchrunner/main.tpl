@@ -116,5 +116,6 @@
                 </tr>
             </table>
         </form>
+        You can access the pivot report <a href='/pivot'>here</a>.
     </body>
 </html>
