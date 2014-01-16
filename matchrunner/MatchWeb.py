@@ -14,6 +14,7 @@
 import os
 import sys
 import time
+import json
 import argparse
 
 # Include bottle specifics
@@ -108,6 +109,20 @@ def MatchDetails(db, matchId):
         WHERE `id` = ?
         """, [matchId]).fetchall()
     return { "match": [ dict(rows) for rows in matchData ] }
+
+
+@get("/pivot")
+def Pivot(db):
+    cursor = db.cursor()
+
+    pivotData = cursor.execute("""
+        SELECT *
+        FROM `matches`
+        """).fetchall()
+    pivotData = [ dict(rows) for rows in pivotData ]
+
+    return template("pivot.tpl", { "pivotData": json.dumps(pivotData) })
+
 
 if __name__ == "__main__":
     argParser = argparse.ArgumentParser(prog = "MatchWeb",

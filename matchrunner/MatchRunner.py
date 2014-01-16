@@ -128,7 +128,7 @@ class MatchRunner(Daemon):
             sys.stdout.write("Matches to run %s\n" % matches)
 
             sys.stdout.write("Deploying latest version of the bots\n")
-            #os.system("cd %s ; git fetch ; git rebase ; make all" % gSourceLoc)
+            os.system("cd %s ; git fetch ; git rebase ; make all" % gSourceLoc)
 
             sys.stdout.write("Running matches...\n")
             for match in matches:
