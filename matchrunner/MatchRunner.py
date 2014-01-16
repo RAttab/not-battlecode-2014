@@ -6,7 +6,7 @@
 # Description:      A daemon for running battlecode matches
 # Author:           Marc Vieira Cardinal
 # Creation Date:    January 14, 2014
-# Revision Date:    January 14, 2014
+# Revision Date:    January 15, 2014
 # **********
 
 
@@ -19,9 +19,11 @@ import argparse
 
 # Application specific imports
 from daemon import Daemon
+from CombatRunner import CombatRunner
 
 
 gDBFile = "/home/ncode/not-battlecode-2014/matchrunner/state.db"
+gSourceLoc = os.path.expanduser("~/not-battlecode-2014/")
 
 
 def DBSetRunningToError():
@@ -73,12 +75,20 @@ class MatchRunner(Daemon):
             matches = DBGetQueuedMatchList()
             sys.stdout.write("Matches to run %s\n" % matches)
 
-            ## Put some code here to run the matches...
+            sys.stdout.write("Deploying latest version of the bots\n")
+            os.system("cd %s ; git fetch ; git rebase ; make all" % gSourceLoc)
+
+            sys.stdout.write("Running matches...\n")
+            for match in matches:
+                result = CombatRunner.Run({ "bc.game.team-a": match['bota'],
+                                            "bc.game.team-b": match['botb'],
+                                            "bc.game.maps":   match['map'] })
+                print result
 
             sys.stdout.write("--- Checkpoint %s\n"
                 % time.strftime("%Y-%m-%d %H:%M:%S"))
             sys.stdout.flush()
-            time.sleep(10)
+            time.sleep(60)
 
 
 if __name__ == "__main__":

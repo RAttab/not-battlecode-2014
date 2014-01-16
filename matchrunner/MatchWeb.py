@@ -6,7 +6,7 @@
 # Description:      An http based match frontend for battlecode
 # Author:           Marc Vieira Cardinal
 # Creation Date:    January 14, 2014
-# Revision Date:    January 14, 2014
+# Revision Date:    January 15, 2014
 # **********
 
 
@@ -37,6 +37,7 @@ def Main(db):
             `endedon`,
             `bota`,
             `botb`,
+            `map`,
             `winner`,
             `state`,
             `log`
@@ -54,6 +55,13 @@ def Main(db):
         ORDER BY `name` ASC
         """).fetchall()
 
+    tplData['mapNames'] = cursor.execute("""
+        SELECT
+            `name`
+        FROM `maps`
+        ORDER BY `name` ASC
+        """).fetchall()
+
     return template("main.tpl", tplData)
 
 @post("/")
@@ -62,16 +70,18 @@ def SubmitMatch(db):
 
     botA = request.forms.botA
     botB = request.forms.botB
+    mapName = request.forms.mapName
 
-    if botA and botB:
+    if botA and botB and mapName:
         cursor.execute("""
             INSERT INTO `matches`
-                (`schedon`, `bota`, `botb`, `state`)
+                (`schedon`, `bota`, `botb`, `map`, `state`)
             VALUES
-                (?, ?, ?, ?)
+                (?, ?, ?, ?, ?)
             """, (time.strftime("%Y-%m-%d %H:%M:%S"),
                   botA,
                   botB,
+                  mapName,
                   'queued'))
 
     # Return our default page
@@ -91,6 +101,7 @@ def MatchDetails(db, matchId):
             `bota`,
             `botb`,
             `winner`,
+            `map`,
             `state`,
             `log`
         FROM `matches`

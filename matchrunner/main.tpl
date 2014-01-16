@@ -38,6 +38,7 @@
                     <th>Ended On</th>
                     <th>Bot A</th>
                     <th>Bot B</th>
+                    <th>Map</th>
                     <th>Winner</th>
                     <th>State</th>
                     <th>Logs</th>
@@ -50,6 +51,7 @@
                         <td>{{ match['endedon'] }}</td>
                         <td>{{ match['bota'] }}</td>
                         <td>{{ match['botb'] }}</td>
+                        <td>{{ match['map'] }}</td>
                         <td>{{ match['winner'] }}</td>
                         <td>{{ match['state'] }}</td>
                         <td><a href="/match/{{ match['id'] }}">Details</a></td>
@@ -70,6 +72,14 @@
                             <option value="">- Bot B -</option>
                             %for bot in bots:
                                 <option>{{ bot['name'] }}</option>
+                            %end
+                        </select>
+                    </th>
+                    <th>
+                        <select name="mapName">
+                            <option value="">- Map Name -</option>
+                            %for mapName in mapNames:
+                                <option>{{ mapNames['name'] }}</option>
                             %end
                         </select>
                     </th>
