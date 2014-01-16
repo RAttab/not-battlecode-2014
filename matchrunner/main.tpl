@@ -26,9 +26,36 @@
                 background-color: white;
                 -moz-border-radius: 0px 0px 0px 0px;
             }
+            #counter {
+                font-weight:bold;
+                font-family:courier new;
+                font-size:12pt;
+            }
         </style>
     </head>
     <body>
+        <center>
+            Next refresh in <span id=counter> </span> seconds.<br />
+            Or click <a href="javascript:self.location.reload()">here</a> to refresh now.
+        </center>
+
+        <script>
+            var counterObj = document.all ? counter : document.getElementById("counter");
+            var countdownFrom = 120; //countdown period in seconds
+            var currentSecond = counterObj.innerHTML = countdownFrom+1; 
+
+            function countdown() {
+                if (currentSecond > 1) {
+                    currentSecond -= 1;
+                    counterObj.innerHTML = currentSecond;
+                } else {
+                    self.location.reload();
+                    return;
+                }
+                setTimeout("countdown()",1000)
+            }
+            countdown()
+        </script>
         <form action="/" method="post">
             <table class="result">
                 <tr>

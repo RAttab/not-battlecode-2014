@@ -27,7 +27,7 @@ gSourceLoc = os.path.expanduser("~/not-battlecode-2014/")
 
 
 def DBSetRunningToError():
-    con = sqlite3.connect(gDBFile)
+    con = sqlite3.connect(gDBFile, isolation_level=None)
     con.row_factory = sqlite3.Row
     cursor = con.cursor()
     
@@ -41,7 +41,7 @@ def DBSetRunningToError():
 
 
 def DBGetQueuedMatchList():
-    con = sqlite3.connect(gDBFile)
+    con = sqlite3.connect(gDBFile, isolation_level=None)
     con.row_factory = sqlite3.Row
     cursor = con.cursor()
 
@@ -49,7 +49,8 @@ def DBGetQueuedMatchList():
         SELECT
             `id`,
             `bota`,
-            `botb`
+            `botb`,
+            `map`
         FROM `matches`
         WHERE `state` = 'queued'
         ORDER BY
@@ -62,8 +63,59 @@ def DBGetQueuedMatchList():
     return matches
 
 
+def DBStartMatch(matchId):
+    con = sqlite3.connect(gDBFile, isolation_level=None)
+    con.row_factory = sqlite3.Row
+    cursor = con.cursor()
+
+    cursor.execute("""
+        UPDATE `matches`
+        SET
+            `state` = 'running',
+            `startedon` = ?
+        WHERE `id` = ?
+        """, (time.strftime("%Y-%m-%d %H:%M:%S"),
+              matchId))
+    con.close()
+
+
+def DBEndMatch(matchId, log, winner):
+    con = sqlite3.connect(gDBFile, isolation_level=None)
+    con.row_factory = sqlite3.Row
+    cursor = con.cursor()
+
+    cursor.execute("""
+        UPDATE `matches`
+        SET
+            `state` = ?,
+            `log` = ?,
+            `winner` = ?,
+            `endedon` = ?
+        WHERE `id` = ?
+        """, ( ('error' if winner == "" else 'success'),
+               str(log),
+               winner,
+               time.strftime("%Y-%m-%d %H:%M:%S"),
+               matchId ))
+    con.close()
+
+
 class MatchRunner(Daemon):
     def run(self):
+
+        # TODO: Make this better by detecting if it has already been done
+        # or simply overwite the build.xml with a sample
+        sys.stdout.write("""
+            This requires a patched build.xml like so:
+              <target name="file" depends="build">
+                <java
+                 classpathref="classpath.run"
+                 fork="yes"
+                 classname="battlecode.server.Main">
+                  <jvmarg value="-Dbc.server.mode=headless"/>
+                  <arg line="-c ${config}"/>    <<<<<<<<<<<<<<<<<<<<<<<<<<<
+                </java>
+              </target>\n\n""")
 
         # Since we just started the MatchRunner,
         # set the matches that were already running to "error"
@@ -76,14 +128,22 @@ class MatchRunner(Daemon):
             sys.stdout.write("Matches to run %s\n" % matches)
 
             sys.stdout.write("Deploying latest version of the bots\n")
-            os.system("cd %s ; git fetch ; git rebase ; make all" % gSourceLoc)
+            #os.system("cd %s ; git fetch ; git rebase ; make all" % gSourceLoc)
 
             sys.stdout.write("Running matches...\n")
             for match in matches:
-                result = CombatRunner.Run({ "bc.game.team-a": match['bota'],
-                                            "bc.game.team-b": match['botb'],
-                                            "bc.game.maps":   match['map'] })
+                DBStartMatch(match["id"])
+
+                cbRun = CombatRunner()
+                result = cbRun.Run({ "bc.game.team-a": match['bota'],
+                                     "bc.game.team-b": match['botb'],
+                                     "bc.game.maps":   match['map'],
+                                     "bc.server.save-file": "match-%s-%s.rms"
+                                        % (time.strftime("%Y%m%d-%H%M%S"),
+                                           match['id']) })
                 print result
+
+                DBEndMatch(match["id"], result['raw'], result['winnerName'])
 
             sys.stdout.write("--- Checkpoint %s\n"
                 % time.strftime("%Y-%m-%d %H:%M:%S"))

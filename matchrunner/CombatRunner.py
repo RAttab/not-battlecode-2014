@@ -17,18 +17,21 @@ import json
 import tempfile
 import subprocess
 
-# can be tested using:
-# import CombatRunner
-# cRunner = CombatRunner.CombatRunner()
-# print cRunner.ParseAntRunResult(cRunner.AntRunHeadless("/home/myuser/Desktop/Battlecode2013/","bc.conf"))
-# will return something like:
-# {'maxRound': 500,
-# 'raw': [ ... wtv was returned by the ant file command ... ],
-# 'winnerName': 'fieldbot',
-# 'winnerTeam': 'A'}
+
+# This requires a patched build.xml like so:
+  # <target name="file" depends="build">
+  #   <java
+  #    classpathref="classpath.run"
+  #    fork="yes"
+  #    classname="battlecode.server.Main">
+  #     <jvmarg value="-Dbc.server.mode=headless"/>
+  #     <arg line="-c ${config}"/>                  <<<<<<<<<<<<<<<<<<<<<<<<<<<
+  #   </java>
+  # </target>
+
 
 class CombatRunner:
-    bcTemplateFile = "bc.conf.tpl"
+    bcTemplateFile = os.path.expanduser("~/not-battlecode-2014/matchrunner/bc.conf.tpl")
     bcPath = os.path.expanduser("~/Battlecode2014/")
 
     def Run(self, config):
@@ -57,7 +60,7 @@ class CombatRunner:
 
         # Delete the temp config file
         fh.close()
-        os.remove(filename)
+        #os.remove(filename)
 
         return result
 
