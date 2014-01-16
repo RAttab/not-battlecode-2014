@@ -22,7 +22,7 @@ from daemon import Daemon
 from CombatRunner import CombatRunner
 
 
-gDBFile = "/home/ncode/not-battlecode-2014/matchrunner/state.db"
+gDBFile =    os.path.expanduser("~/not-battlecode-2014/matchrunner/state.db")
 gSourceLoc = os.path.expanduser("~/not-battlecode-2014/")
 
 
