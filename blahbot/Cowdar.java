@@ -8,7 +8,7 @@ class CowSpot
     public MapLocation loc;
     public double density;
 
-    public CowSpot(RobotController rc, MapLocation loc, MapLocation myHQ, MapLocation badHQ) 
+    public CowSpot(RobotController rc, MapLocation loc) 
             throws GameActionException {
         // Note: Do not create a CowSpot closer than 5 tiles from the map edge!
 
@@ -25,33 +25,34 @@ class CowSpot
 
 
             double wallPen = 0.0;
-            // we want to stay away from walls. sample for them!
+            // we want to stay away from walls if possible. sample for them!
             for (int i=8; i-- > 0;) {
                 MapLocation next = new MapLocation(loc.x + Utils.samples_5[i], 
                                                     loc.y + Utils.samples_5[i+10]);
                 if (rc.senseTerrainTile(next) == TerrainTile.VOID)
-                    wallPen -= 7;
+                    wallPen -= 5;
             }
 
             // we want to build closer to our HQ than the enemy's
-            int enemyDistSqr = loc.distanceSquaredTo(badHQ);
-            int homeDistSqr = loc.distanceSquaredTo(myHQ);
+            int enemyDistSqr = loc.distanceSquaredTo(Cowdar.enemyHqLoc);
+            int homeDistSqr = loc.distanceSquaredTo(Cowdar.hqLoc);
             double coeffHq;
 
             if (homeDistSqr > enemyDistSqr) {
-                coeffHq = (homeDistSqr - enemyDistSqr) * 0.1;
+                coeffHq = (enemyDistSqr - homeDistSqr) * 0.1;
 
                 // System.out.println("Density at (" + loc.x + ", " + loc.y + "): ");
+                // System.out.println("enemyDist = " + enemyDistSqr);
+                // System.out.println("homeDist = " + homeDistSqr);
                 // System.out.println("closer to enemy hq than our own.");
                 // System.out.println("coeffHq = " + coeffHq);
                 // System.out.println("sexyCows = " + sexyCows);
                 // System.out.println("wallPen = " + wallPen);
                 density = coeffHq + sexyCows + wallPen;
                 // System.out.println("...density equals [" + density + "]");
-            }
-            else{
+            } else {
                 double d = (Math.pow(enemyDistSqr - homeDistSqr, 0.6));
-                coeffHq = 100/ (1+ d);
+                coeffHq = 5 * Cowdar.distBetweenHqs / (1 + d);
                 // System.out.println("Density at (" + loc.x + ", " + loc.y + "): ");
                 // System.out.println("coeffHq = " + coeffHq);
                 // System.out.println("sexyCows = " + sexyCows);
@@ -80,6 +81,7 @@ public class Cowdar
     public static MapLocation hqLoc;
     public static MapLocation enemyHqLoc;
     public static Direction awayFromEnemyHq;
+    public static double distBetweenHqs;
 
     public static void init(RobotController _rc) throws GameActionException
     {
@@ -91,8 +93,9 @@ public class Cowdar
         mapHeight = rc.getMapHeight();
         mapWidth = rc.getMapWidth();
         awayFromEnemyHq = hqLoc.directionTo(rc.senseEnemyHQLocation()).opposite();
+        distBetweenHqs = Math.sqrt(hqLoc.distanceSquaredTo(enemyHqLoc));
 
-        bestSpot = new CowSpot(rc, getFirstLoc(), hqLoc, enemyHqLoc);
+        bestSpot = new CowSpot(rc, getFirstLoc());
 
     }
 
@@ -122,13 +125,14 @@ public class Cowdar
         MapLocation loc;
         CowSpot spot = bestSpot;
 
+        // starts at the last best spot seen and moves randomly in small increments from there
         while (Clock.getBytecodeNum() - start < byteCodeLimit + 800){
             // int start_debug = Clock.getBytecodeNum();
 
             loc = new MapLocation(spot.loc.x + Utils.rand_5(), spot.loc.y + Utils.rand_5());
             
             // System.out.println("loc: " + loc.x + " " + loc.y);
-            spot = new CowSpot(rc, loc, hqLoc, enemyHqLoc);
+            spot = new CowSpot(rc, loc);
             // System.out.println("spot.loc: " + spot.loc.x + " " + spot.loc.y);
             if (spot.density > bestSpot.density){
                 System.out.println("New best spot found: (" + spot.loc.x + " " + spot.loc.y 
