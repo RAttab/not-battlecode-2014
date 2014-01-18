@@ -19,7 +19,7 @@ BIN_DIR := $(INSTALL_DIR)/bin
 
 all: install-bots install-maps
 
-BOTS := blahbot
+BOTS := blahbot coarsenserPlayer farmbot hubertTheFraternal paulTheConqueror
 
 install-bots: $(foreach bot,$(BOTS),$(INSTALL_DIR)/teams/$(bot))
 $(INSTALL_DIR)/teams/%:
