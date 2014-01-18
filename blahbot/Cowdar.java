@@ -8,25 +8,59 @@ class CowSpot
     public MapLocation loc;
     public double density;
 
-    public CowSpot(RobotController rc, MapLocation loc) throws GameActionException {
+    public CowSpot(RobotController rc, MapLocation loc, MapLocation myHQ, MapLocation badHQ) 
+            throws GameActionException {
         // Note: Do not create a CowSpot closer than 5 tiles from the map edge!
-
-        // TODO: incorporate distance to HQ and EnemyHQ
 
         this.loc = loc;
         // System.out.println("CowSpot constructor called with loc: " + loc.x + "," + loc.y);
         // System.out.println(rc);
         if (rc.senseTerrainTile(loc) == TerrainTile.OFF_MAP 
                     || rc.senseTerrainTile(loc) == TerrainTile.VOID) {
-            density = -100;
+            // can't build on walls!
+            density = -10000;
         } else {
-            density = Cowdar.cowSexSum(loc.x - 5, loc.y - 5, loc.x + 5, loc.y + 5);
+            // how sexy are the cows in this pasture?
+            double sexyCows = Cowdar.cowSexSum(loc.x - 5, loc.y - 5, loc.x + 5, loc.y + 5);
 
+
+            double wallPen = 0.0;
+            // we want to stay away from walls. sample for them!
             for (int i=8; i-- > 0;) {
                 MapLocation next = new MapLocation(loc.x + Utils.samples_5[i], 
                                                     loc.y + Utils.samples_5[i+10]);
                 if (rc.senseTerrainTile(next) == TerrainTile.VOID)
-                    density -= 4;
+                    wallPen -= 7;
+            }
+
+            // we want to build closer to our HQ than the enemy's
+            int enemyDistSqr = loc.distanceSquaredTo(badHQ);
+            int homeDistSqr = loc.distanceSquaredTo(myHQ);
+            double coeffHq;
+
+            if (homeDistSqr > enemyDistSqr) {
+                coeffHq = (homeDistSqr - enemyDistSqr) * 0.1;
+
+                // System.out.println("Density at (" + loc.x + ", " + loc.y + "): ");
+                // System.out.println("closer to enemy hq than our own.");
+                // System.out.println("coeffHq = " + coeffHq);
+                // System.out.println("sexyCows = " + sexyCows);
+                // System.out.println("wallPen = " + wallPen);
+                density = coeffHq + sexyCows + wallPen;
+                // System.out.println("...density equals [" + density + "]");
+            }
+            else{
+                double d = (Math.pow(enemyDistSqr - homeDistSqr, 0.6));
+                coeffHq = 100/ (1+ d);
+                // System.out.println("Density at (" + loc.x + ", " + loc.y + "): ");
+                // System.out.println("coeffHq = " + coeffHq);
+                // System.out.println("sexyCows = " + sexyCows);
+                // System.out.println("wallPen = " + wallPen);
+                // System.out.println("enemyDist = " + enemyDistSqr);
+                // System.out.println("homeDist = " + homeDistSqr);
+                // System.out.println("d = " + d);
+                density = coeffHq + sexyCows + wallPen;
+                // System.out.println("...density equals [" + density + "]");
             }
         }
     }
@@ -44,6 +78,7 @@ public class Cowdar
     public static int mapWidth;
     public static int mapHeight;
     public static MapLocation hqLoc;
+    public static MapLocation enemyHqLoc;
     public static Direction awayFromEnemyHq;
 
     public static void init(RobotController _rc) throws GameActionException
@@ -52,11 +87,12 @@ public class Cowdar
 
         cowSex = rc.senseCowGrowth();
         hqLoc = rc.senseHQLocation();
+        enemyHqLoc = rc.senseEnemyHQLocation();
         mapHeight = rc.getMapHeight();
         mapWidth = rc.getMapWidth();
         awayFromEnemyHq = hqLoc.directionTo(rc.senseEnemyHQLocation()).opposite();
 
-        bestSpot = new CowSpot(rc, getFirstLoc());
+        bestSpot = new CowSpot(rc, getFirstLoc(), hqLoc, enemyHqLoc);
 
     }
 
@@ -92,7 +128,7 @@ public class Cowdar
             loc = new MapLocation(spot.loc.x + Utils.rand_5(), spot.loc.y + Utils.rand_5());
             
             // System.out.println("loc: " + loc.x + " " + loc.y);
-            spot = new CowSpot(rc, loc);
+            spot = new CowSpot(rc, loc, hqLoc, enemyHqLoc);
             // System.out.println("spot.loc: " + spot.loc.x + " " + spot.loc.y);
             if (spot.density > bestSpot.density){
                 System.out.println("New best spot found: (" + spot.loc.x + " " + spot.loc.y 
