@@ -13,9 +13,8 @@ class CowSpot
         // Note: Do not create a CowSpot closer than 5 tiles from the map edge!
 
         this.loc = loc;
-        // System.out.println("CowSpot constructor called with loc: " + loc.x + "," + loc.y);
-        // System.out.println(rc);
-        if (rc.senseTerrainTile(loc) == TerrainTile.OFF_MAP 
+        Logger.log(10, "CowSpot constructor called with loc: " + loc.x + "," + loc.y);
+        if (rc.senseTerrainTile(loc) == TerrainTile.OFF_MAP
                     || rc.senseTerrainTile(loc) == TerrainTile.VOID) {
             // can't build on walls!
             density = -10000;
@@ -41,27 +40,27 @@ class CowSpot
             if (homeDistSqr > enemyDistSqr) {
                 coeffHq = (enemyDistSqr - homeDistSqr) * 0.1;
 
-                // System.out.println("Density at (" + loc.x + ", " + loc.y + "): ");
-                // System.out.println("enemyDist = " + enemyDistSqr);
-                // System.out.println("homeDist = " + homeDistSqr);
-                // System.out.println("closer to enemy hq than our own.");
-                // System.out.println("coeffHq = " + coeffHq);
-                // System.out.println("sexyCows = " + sexyCows);
-                // System.out.println("wallPen = " + wallPen);
+                Logger.log(10, "Density at (" + loc.x + ", " + loc.y + "): ");
+                Logger.log(10, "enemyDist = " + enemyDistSqr);
+                Logger.log(10, "homeDist = " + homeDistSqr);
+                Logger.log(10, "closer to enemy hq than our own.");
+                Logger.log(10, "coeffHq = " + coeffHq);
+                Logger.log(10, "sexyCows = " + sexyCows);
+                Logger.log(10, "wallPen = " + wallPen);
                 density = coeffHq + sexyCows + wallPen;
-                // System.out.println("...density equals [" + density + "]");
+                Logger.log(10, "...density equals [" + density + "]");
             } else {
                 double d = (Math.pow(enemyDistSqr - homeDistSqr, 0.6));
                 coeffHq = 5 * Cowdar.distBetweenHqs / (1 + d);
-                // System.out.println("Density at (" + loc.x + ", " + loc.y + "): ");
-                // System.out.println("coeffHq = " + coeffHq);
-                // System.out.println("sexyCows = " + sexyCows);
-                // System.out.println("wallPen = " + wallPen);
-                // System.out.println("enemyDist = " + enemyDistSqr);
-                // System.out.println("homeDist = " + homeDistSqr);
-                // System.out.println("d = " + d);
+                Logger.log(10, "Density at (" + loc.x + ", " + loc.y + "): ");
+                Logger.log(10, "coeffHq = " + coeffHq);
+                Logger.log(10, "sexyCows = " + sexyCows);
+                Logger.log(10, "wallPen = " + wallPen);
+                Logger.log(10, "enemyDist = " + enemyDistSqr);
+                Logger.log(10, "homeDist = " + homeDistSqr);
+                Logger.log(10, "d = " + d);
                 density = coeffHq + sexyCows + wallPen;
-                // System.out.println("...density equals [" + density + "]");
+                Logger.log(10, "...density equals [" + density + "]");
             }
         }
     }
@@ -127,20 +126,20 @@ public class Cowdar
 
         // starts at the last best spot seen and moves randomly in small increments from there
         while (Clock.getBytecodeNum() - start < byteCodeLimit + 800){
-            // int start_debug = Clock.getBytecodeNum();
+            int start_debug = Clock.getBytecodeNum();
 
             loc = new MapLocation(spot.loc.x + Utils.rand_5(), spot.loc.y + Utils.rand_5());
             
-            // System.out.println("loc: " + loc.x + " " + loc.y);
+            Logger.log(10, "loc: " + loc.x + " " + loc.y);
             spot = new CowSpot(rc, loc);
-            // System.out.println("spot.loc: " + spot.loc.x + " " + spot.loc.y);
+            Logger.log(10, "spot.loc: " + spot.loc.x + " " + spot.loc.y);
             if (spot.density > bestSpot.density){
                 System.out.println("New best spot found: (" + spot.loc.x + " " + spot.loc.y 
                                     + ") ~ " + spot.density + ">" + bestSpot.density);
                 bestSpot = spot;
             }
 
-            // System.out.println("loop used " + (Clock.getBytecodeNum() - start_debug) + " bc");
+            Logger.log(10, "loop used " + (Clock.getBytecodeNum() - start_debug) + " bc");
 
         }
         rc.breakpoint();
