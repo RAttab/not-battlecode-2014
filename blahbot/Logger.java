@@ -3,6 +3,11 @@ package blahbot;
 import battlecode.common.*;
 
 public class Logger {
+	// Channel info:
+	// 0, 1, 2 : critical information
+	// 5 : bytecode debugging
+	// 10 : cowdar debugging
+	
 	public static int[] ACTIVE_CHANNELS = {0,1,2};
 	public static boolean TO_STDOUT = false;
 
