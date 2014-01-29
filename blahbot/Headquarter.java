@@ -21,7 +21,7 @@ public class Headquarter
         return false;
     }
 
-    static void shoot() throws GameActionException
+    static boolean shoot() throws GameActionException
     {
         final int SplashRd = 2;
         final int AttackRd = RobotType.HQ.attackRadiusMaxSquared;
@@ -29,9 +29,9 @@ public class Headquarter
         Robot objs[] = rc.senseNearbyGameObjects(Robot.class, AttackRd, Utils.him);
 
         Robot bestTarget = null;
-        double bestScore = 50;
+        double bestScore = 0;
 
-        for (int i = 0; i < objs.length; ++i) {
+        for (int i = objs.length; i-- > 0; ) {
             double score = RobotType.HQ.attackPower;
 
             Robot dmg[] = rc.senseNearbyGameObjects(Robot.class, SplashRd, Utils.him);
@@ -40,15 +40,16 @@ public class Headquarter
             Robot ff[] = rc.senseNearbyGameObjects(Robot.class, SplashRd, Utils.me);
             score -= ff.length * RobotType.HQ.splashPower;
 
-            if (score < bestScore) continue;
+            if (score <= bestScore) continue;
 
             bestTarget = objs[i];
             bestScore = score;
         }
 
-        if (bestTarget == null) return;
+        if (bestTarget == null) return false;
 
         rc.attackSquare(rc.senseLocationOf(bestTarget));
+        return true;
     }
 
     public static void run(RobotController rc) throws GameActionException
@@ -65,10 +66,7 @@ public class Headquarter
         while (true) {
             ByteCode.Check bcCheck = new ByteCode.Check(rc);
 
-            if (rc.isActive()) {
-                if (!spawn()) shoot();
-            }
-
+            if (rc.isActive() && !shoot()) spawn();
             general.command();
 
             bcCheck.debug_check("Headquarter.end");
