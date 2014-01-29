@@ -82,9 +82,9 @@ public class RangerPathing
 			// if (nextDir == null)
 			// 	return null;
 
-			Logger.log(0, "WARNING! Pathing hit map edge in a sitation that seems impossible!");
-			Logger.log(1, "maybe it's trying to get to an off-map target location?");
-			Logger.log(2, "Target: (" + target.x + ", " + target.y + ")");
+			Logger.debug_log(0, "WARNING! Pathing hit map edge in a sitation that seems impossible!");
+			Logger.debug_log(1, "maybe it's trying to get to an off-map target location?");
+			Logger.debug_log(2, "Target: (" + target.x + ", " + target.y + ")");
 
 			return null;
 		}
@@ -155,7 +155,7 @@ public class RangerPathing
 
 		// SHOULD NEVER REACH THIS POINT
 		else {
-			Logger.log(0, "WARNING! Max is retarded and messed up his pathing conditions!");
+			Logger.debug_log(0, "WARNING! Max is retarded and messed up his pathing conditions!");
 		}
 		return null; // so we can compile for now REMOVE THIS
 	}
