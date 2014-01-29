@@ -36,7 +36,7 @@ public class Soldier
         final MapLocation pos = rc.getLocation();
 
         for (int i = 0; i < spots.length; ++i) {
-            if (spots[i] != null && spots[i].distanceSquaredTo(pos) < 200)
+            if (spots[i] != null && spots[i].distanceSquaredTo(pos) < 100)
                 return spots[i];
         }
 
