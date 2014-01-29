@@ -97,11 +97,18 @@ public class General
         return true;
     }
 
-    boolean giveOrder()
+    boolean giveOrder() throws GameActionException
     {
         Robot bots[] =
-            rc.senseNearbyGameObjects(Robot.class, rallyPoint, 100, Utils.me);
-        return bots.length >= 4;
+            rc.senseNearbyGameObjects(Robot.class, rallyPoint, 40, Utils.me);
+
+        int num = 0;
+        for (int i = bots.length; i-- > 0;) {
+            RobotInfo info = rc.senseRobotInfo(bots[i]);
+            if (info.type == RobotType.SOLDIER) num++;
+        }
+
+        return num >= 3;
     }
 
     void command() throws GameActionException
