@@ -59,6 +59,9 @@ public class Headquarter
         Headquarter.pq = new ProgressQuest(rc);
         Cowdar.init(rc);
 
+        // Respect the proper styling requirements.
+        rc.wearHat();
+
         while (true) {
             ByteCode.Check bcCheck = new ByteCode.Check(rc);
 
