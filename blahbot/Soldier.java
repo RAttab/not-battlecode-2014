@@ -49,19 +49,25 @@ public class Soldier
                 Robot.class, RobotType.SOLDIER.sensorRadiusSquared, Utils.me);
         if (allies.length == 0) return false;
 
-        boolean seenPastr = false;
+        MapLocation pastrPos = null;
+
         for (int i = allies.length; i-- > 0;) {
             RobotInfo info = rc.senseRobotInfo(allies[i]);
 
             if (info.type == RobotType.NOISETOWER) return false;
-            if (info.type == RobotType.PASTR) seenPastr = true;
-            if (info.isConstructing) {
-                if (info.constructingType == RobotType.PASTR) seenPastr = true;
+
+            if (info.type == RobotType.PASTR)
+                pastrPos = info.location;
+
+            else if (info.isConstructing) {
+                if (info.constructingType == RobotType.PASTR)
+                    pastrPos = info.location;
                 else return false;
             }
         }
 
-        return seenPastr;
+        if (pastrPos == null) return false;
+        return rc.getLocation().distanceSquaredTo(pastrPos) < 5;
     }
 
     public static void run(RobotController rc) throws GameActionException
