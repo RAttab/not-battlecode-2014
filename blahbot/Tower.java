@@ -4,17 +4,37 @@ import battlecode.common.*;
 
 public class Tower
 {
-    static void analyse() throws GameActionException
+    static MapLocation pastr() throws GameActionException
+    {
+        MapLocation[] pastrs = rc.sensePastrLocations(Utils.me);
+        if (pastrs.length == 0) return null;
+
+        int minDist = 50;
+        MapLocation pastr = null;
+        MapLocation pos = rc.getLocation();
+
+        for (int i = pastrs.length; i-- > 0;) {
+            int dist = pos.distanceSquaredTo(pastrs[i]);
+            if (dist > minDist) continue;
+
+            minDist = dist;
+            pastr = pastrs[i];;
+        }
+
+        return pastr;
+    }
+
+    static void analyse(MapLocation pastr) throws GameActionException
     {
 
     }
 
-    static void shoot() throws GameActionException
+    static void shoot(MapLocation pastr) throws GameActionException
     {
         final int senseRd = RobotType.NOISETOWER.sensorRadiusSquared;
         final int attackRd = RobotType.NOISETOWER.attackRadiusMaxSquared;
 
-
+        
     }
 
     static void spot() throws GameActionException
@@ -34,8 +54,17 @@ public class Tower
         while (true) {
             spot();
 
-            if (rc.isActive()) shoot();
-            else analyse();
+            MapLocation pastr = pastr();
+
+            // No use keeping this tower alive so reclaim our supply.
+            if (pastr == null) {
+                System.out.println("Game over man! Game over!");
+                rc.selfDestruct();
+                return;
+            }
+
+            if (rc.isActive()) shoot(pastr);
+            else analyse(pastr);
 
             rc.yield();
         }
