@@ -65,8 +65,9 @@ public class Headquarter
         while (true) {
             ByteCode.Check bcCheck = new ByteCode.Check(rc);
 
-            if (rc.isActive() && spawn());
-            else shoot();
+            if (rc.isActive()) {
+                if (!spawn()) shoot();
+            }
 
             general.command();
 
