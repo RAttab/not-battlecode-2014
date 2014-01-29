@@ -165,7 +165,7 @@ class SoldierCombat
             RobotInfo info = rc.senseRobotInfo(allies[i]);
             if (info.type == RobotType.HQ) continue;
 
-            hisHealth += info.health;
+            myHealth += info.health;
             minHealth = Math.min(minHealth, info.health);
         }
 
