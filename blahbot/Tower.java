@@ -2,7 +2,7 @@ package blahbot;
 
 import battlecode.common.*;
 
-public class Bases
+public class Tower
 {
 
     public static void run(RobotController rc) throws GameActionException

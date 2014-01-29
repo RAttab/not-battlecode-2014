@@ -14,7 +14,8 @@ public class RobotPlayer
             try {
                 if (rc.getType() == RobotType.SOLDIER) Soldier.run(rc);
                 if (rc.getType() == RobotType.HQ) Headquarter.run(rc);
-                else Bases.run(rc);
+                if (rc.getType() == RobotType.NOISETOWER) Tower.run(rc);
+                else Pastr.run(rc);
             }
             catch(Exception e) {
                 e.printStackTrace();

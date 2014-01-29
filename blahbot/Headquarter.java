@@ -66,7 +66,6 @@ public class Headquarter
             else shoot();
 
             general.command();
-            // pq.update();
 
             bcCheck.debug_check("Headquarter.end");
             rc.yield();

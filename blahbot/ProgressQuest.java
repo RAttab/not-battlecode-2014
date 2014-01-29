@@ -8,7 +8,7 @@ public class ProgressQuest
 
     public ProgressQuest(RobotController rc) { this.rc = rc; }
 
-    public void update()
+    public void progress()
     {
         int round = Clock.getRoundNum();
         if (round % ProgressRate > 0) return;
