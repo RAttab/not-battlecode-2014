@@ -71,15 +71,6 @@ public class Soldier
         Soldier.combat = new SoldierCombat(rc, comm);
         Soldier.pathing = new BugPathing(rc);
 
-        System.out.println(Direction.NORTH.ordinal());
-        System.out.println(Direction.NORTH_EAST.ordinal());
-        System.out.println(Direction.EAST.ordinal());
-        System.out.println(Direction.SOUTH_EAST.ordinal());
-        System.out.println(Direction.SOUTH.ordinal());
-        System.out.println(Direction.SOUTH_WEST.ordinal());
-        System.out.println(Direction.WEST.ordinal());
-        System.out.println(Direction.NORTH_WEST.ordinal());
-
         while (true) {
 
             // \todo Might want to do some calcs in our off turns.
