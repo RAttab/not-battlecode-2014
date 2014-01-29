@@ -9,6 +9,7 @@ class WayPoint
 	public MapLocation loc;
 	public int dist; 
 	public boolean obstacle;
+	public boolean isGoal;
 	
 	public WayPoint back;
 
@@ -22,6 +23,7 @@ class WayPoint
 		obstacle = blocker;
 		right = null;
 		left = null;
+		isGoal = ml.distanceSquaredTo(RangerPathing.target) < 5;
 	}
 
 	public WayPoint(MapLocation ml, int distance, boolean blocker, WayPoint lastWp) {
@@ -31,6 +33,7 @@ class WayPoint
 		back = lastWp;
 		right = null;
 		left = null;
+		isGoal = ml.distanceSquaredTo(RangerPathing.target) < 5;
 	}
 }
 
@@ -42,6 +45,7 @@ public class RangerPathing
 	public static WayPoint start;
 	public static boolean ready;
 	public static boolean optimal;
+	public static Deque<WayPoint> stack;
 
 	public static void init(RobotController rc_) {
 		rc = rc_;
@@ -49,20 +53,28 @@ public class RangerPathing
 		optimal = false;
 	}
 
-	public static WayPoint getNextWayPoint(WayPoint fromWp, Direction dir) {
+	// find the next blocker or the goal
+	public static WayPoint getNextWayPoint(WayPoint fromWp) {
 		int dist = 0;
+		
+		Direction dir = fromWp.loc.directionTo(target);
+
 		MapLocation nextLoc = fromWp.loc.add(dir);
 		TerrainTile thisTile = rc.senseTerrainTile(nextLoc);
 
 		while (thisTile == TerrainTile.NORMAL || thisTile == TerrainTile.ROAD ) 
 		{
-			if (thisTile == TerrainTile.TOAD)
+			if (thisTile == TerrainTile.ROAD)
 				dist++;
 			if (thisTile == TerrainTile.NORMAL)
 				dist += 2;
 
 			nextLoc = nextLoc.add(dir);
-			thisTile = rc.getTerrainTile(nextLoc);
+			thisTile = rc.senseTerrainTile(nextLoc);
+
+			if (nextLoc.distanceSquaredTo(target) < 4) {
+				// TODO
+			}
 		}
 
 		if (thisTile == TerrainTile.OFF_MAP){
@@ -72,7 +84,7 @@ public class RangerPathing
 
 			Logger.log(0, "WARNING! Pathing hit map edge in a sitation that seems impossible!");
 			Logger.log(1, "maybe it's trying to get to an off-map target location?");
-			Logger.log(2, "Target: (" + target.x + ", " + taget.y + ")");
+			Logger.log(2, "Target: (" + target.x + ", " + target.y + ")");
 
 			return null;
 		}
@@ -84,47 +96,68 @@ public class RangerPathing
 			Direction toGoal = nextLoc.directionTo(target);
 			Direction right = nextClosestToward(nextLoc, dir.rotateRight(), toGoal);
 			if (right != null)
-				next.right = new getNextWayPoint(next, right, right.rotateLeft());
+				next.right = getNextWayPoint(next, right, right.rotateLeft());
 
 			Direction left = nextClosestToward(nextLoc, dir.rotateLeft(), toGoal);
 			if (left != null)
-				next.left = new getNextWayPoint(next, left, left.rotateRight());
+				next.left = getNextWayPoint(next, left, left.rotateRight());
 		}
+		return null; // so we can compile for now REMOVE THIS
 	}
 
+	// find the end of the blocker or return null
 	public static WayPoint getNextWayPoint(WayPoint fromWp, Direction dir, Direction wallDir) {
 		int dist = 0;
-		MapLocation current = fromWp.loc.add(dir);
-		TerrainTile thisTile = rc.senseTerrainTile(current);
-		TerrainTile wallTile = rc.senseTerrainTile(current.add(wallDir));
+		MapLocation nextLoc = fromWp.loc.add(dir);
+		TerrainTile thisTile = rc.senseTerrainTile(nextLoc);
+		MapLocation wallLoc = nextLoc.add(wallDir);
+		TerrainTile wallTile = rc.senseTerrainTile(wallLoc);
 
 		while ( (thisTile == TerrainTile.NORMAL || thisTile == TerrainTile.ROAD) 
-					&& (wallTile != TerrainTile.NORMAL || wallTile != TerrainTile.ROAD) 
+					&& (wallTile != TerrainTile.NORMAL || wallTile != TerrainTile.ROAD) )
 		{
-			if (thisTile == TerrainTile.TOAD)
+			if (thisTile == TerrainTile.ROAD)
 				dist++;
 			if (thisTile == TerrainTile.NORMAL)
 				dist += 2;
 
-			wallTile = rc.getTerrainTile(current.add(wallDir));
-			current = current.add(dir);
-			thisTile = rc.getTerrainTile(current);
+			wallLoc = nextLoc.add(wallDir);
+			wallTile = rc.senseTerrainTile(wallLoc);
+			nextLoc = nextLoc.add(dir);
+			thisTile = rc.senseTerrainTile(nextLoc);
 		}
 
+		// if we found the end of the wall
 		if (wallTile == TerrainTile.NORMAL || wallTile == TerrainTile.ROAD) {
+			int rotateTarget = wallDir.ordinal() - dir.ordinal();
+			nextLoc = nextLoc.add(dir.opposite());
+			
+			Direction toGoal = nextLoc.directionTo(target);
+			// OH GOD: diagonal and straight walls behave differently here
+			// TODO: deal with head asplode
 			WayPoint next = new WayPoint(nextLoc, dist, false);
+			// next.right = getNextWayPoint(next, wallLoc.directionTo(target));
 		}
 
-		if (thisTile == TerrainTile.OFF_MAP){
-			// this means we are closed off
+		// if we are closed off
+		else if (thisTile == TerrainTile.OFF_MAP){
 			return null;
 		}
 
-		if (thisTile == TerrainTile.VOID) {
+		// if we hit a new wall
+		else if (thisTile == TerrainTile.VOID) {
+			// TODO: this isn't quite right
+			int differential = dir.ordinal() - wallDir.ordinal();
 			nextLoc = nextLoc.add(dir.opposite());
 			Direction toGoal = nextLoc.directionTo(target);
 			WayPoint next = new WayPoint(nextLoc, dist, true);
 		}
+
+		// SHOULD NEVER REACH THIS POINT
+		else {
+			Logger.log(0, "WARNING! Max is retarded and messed up his pathing conditions!");
+		}
+		return null; // so we can compile for now REMOVE THIS
 	}
 
 	public static Direction nextClosestToward(MapLocation loc, Direction dir, Direction toward) {
@@ -163,6 +196,7 @@ public class RangerPathing
 			return true;
 		return false;
 	}
+
 	public static boolean isLeftOf(Direction first, Direction second) {
 		// TODO : I am tired, there's probably a better way to do this
 		// whether first is Left of second
@@ -192,7 +226,7 @@ public class RangerPathing
 		}
 
 		// TODO : better fallback
-        Direction dir = rc.getLocation().directionTo(dest);
+        Direction dir = rc.getLocation().directionTo(target);
 
         if (dir == Direction.OMNI)
             return Direction.NONE;
