@@ -17,7 +17,7 @@ public class Logger {
 		rc = rc_;
 	}
 
-	public static void log(int channel, String msg) {
+	public static void debug_log(int channel, String msg) {
 		for (int chan : ACTIVE_CHANNELS) {
 			if (channel == chan) {
 				if (TO_STDOUT) {

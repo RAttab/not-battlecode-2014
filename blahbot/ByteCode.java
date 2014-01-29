@@ -23,7 +23,7 @@ public class ByteCode
             if (Clock.getRoundNum() == round) return;
 
             int stop = Clock.getBytecodeNum();
-            Logger.log(5, "bytecode overflow(" + str + "): "
+            Logger.debug_log(5, "bytecode overflow(" + str + "): "
                     + "(" + start + ", " + round + ") -> "
                     + "(" + stop + ", " + Clock.getRoundNum() + ")");
             rc.breakpoint();
@@ -55,7 +55,7 @@ public class ByteCode
 
         void debug_dump(String str)
         {
-            Logger.log(5, "profiler(" + str + "): " + get());
+            Logger.debug_log(5, "profiler(" + str + "): " + get());
         }
     }
 
@@ -80,7 +80,7 @@ public class ByteCode
                 mean = 0;
             else
                 mean = sum / n;
-            Logger.log(5, "profiler(" + str + "): " + n
+            Logger.debug_log(5, "profiler(" + str + "): " + n
                     + " [ " + min + ", " + mean + ", " + max + " ]");
         }
 

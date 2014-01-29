@@ -13,7 +13,7 @@ class CowSpot
         // Note: Do not create a CowSpot closer than 5 tiles from the map edge!
 
         this.loc = loc;
-        Logger.log(10, "CowSpot constructor called with loc: " + loc.x + "," + loc.y);
+        Logger.debug_log(10, "CowSpot constructor called with loc: " + loc.x + "," + loc.y);
         if (rc.senseTerrainTile(loc) == TerrainTile.OFF_MAP
                     || rc.senseTerrainTile(loc) == TerrainTile.VOID) {
             // can't build on walls!
@@ -40,27 +40,27 @@ class CowSpot
             if (homeDistSqr > enemyDistSqr) {
                 coeffHq = (enemyDistSqr - homeDistSqr) * 0.1;
 
-                Logger.log(10, "Density at (" + loc.x + ", " + loc.y + "): ");
-                Logger.log(10, "enemyDist = " + enemyDistSqr);
-                Logger.log(10, "homeDist = " + homeDistSqr);
-                Logger.log(10, "closer to enemy hq than our own.");
-                Logger.log(10, "coeffHq = " + coeffHq);
-                Logger.log(10, "sexyCows = " + sexyCows);
-                Logger.log(10, "wallPen = " + wallPen);
+                Logger.debug_log(10, "Density at (" + loc.x + ", " + loc.y + "): ");
+                Logger.debug_log(10, "enemyDist = " + enemyDistSqr);
+                Logger.debug_log(10, "homeDist = " + homeDistSqr);
+                Logger.debug_log(10, "closer to enemy hq than our own.");
+                Logger.debug_log(10, "coeffHq = " + coeffHq);
+                Logger.debug_log(10, "sexyCows = " + sexyCows);
+                Logger.debug_log(10, "wallPen = " + wallPen);
                 density = coeffHq + sexyCows + wallPen;
-                Logger.log(10, "...density equals [" + density + "]");
+                Logger.debug_log(10, "...density equals [" + density + "]");
             } else {
                 double d = (Math.pow(enemyDistSqr - homeDistSqr, 0.6));
                 coeffHq = 5 * Cowdar.distBetweenHqs / (1 + d);
-                Logger.log(10, "Density at (" + loc.x + ", " + loc.y + "): ");
-                Logger.log(10, "coeffHq = " + coeffHq);
-                Logger.log(10, "sexyCows = " + sexyCows);
-                Logger.log(10, "wallPen = " + wallPen);
-                Logger.log(10, "enemyDist = " + enemyDistSqr);
-                Logger.log(10, "homeDist = " + homeDistSqr);
-                Logger.log(10, "d = " + d);
+                Logger.debug_log(10, "Density at (" + loc.x + ", " + loc.y + "): ");
+                Logger.debug_log(10, "coeffHq = " + coeffHq);
+                Logger.debug_log(10, "sexyCows = " + sexyCows);
+                Logger.debug_log(10, "wallPen = " + wallPen);
+                Logger.debug_log(10, "enemyDist = " + enemyDistSqr);
+                Logger.debug_log(10, "homeDist = " + homeDistSqr);
+                Logger.debug_log(10, "d = " + d);
                 density = coeffHq + sexyCows + wallPen;
-                Logger.log(10, "...density equals [" + density + "]");
+                Logger.debug_log(10, "...density equals [" + density + "]");
             }
         }
     }
@@ -130,16 +130,16 @@ public class Cowdar
 
             loc = new MapLocation(spot.loc.x + Utils.rand_5(), spot.loc.y + Utils.rand_5());
             
-            Logger.log(10, "loc: " + loc.x + " " + loc.y);
+            Logger.debug_log(10, "loc: " + loc.x + " " + loc.y);
             spot = new CowSpot(rc, loc);
-            Logger.log(10, "spot.loc: " + spot.loc.x + " " + spot.loc.y);
+            Logger.debug_log(10, "spot.loc: " + spot.loc.x + " " + spot.loc.y);
             if (spot.density > bestSpot.density){
                 System.out.println("New best spot found: (" + spot.loc.x + " " + spot.loc.y 
                                     + ") ~ " + spot.density + ">" + bestSpot.density);
                 bestSpot = spot;
             }
 
-            Logger.log(10, "loop used " + (Clock.getBytecodeNum() - start_debug) + " bc");
+            Logger.debug_log(10, "loop used " + (Clock.getBytecodeNum() - start_debug) + " bc");
 
         }
         rc.breakpoint();
