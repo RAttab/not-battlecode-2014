@@ -4,6 +4,19 @@ import battlecode.common.*;
 
 public class Tower
 {
+    static void analyse() throws GameActionException
+    {
+
+    }
+
+    static void shoot() throws GameActionException
+    {
+        final int senseRd = RobotType.NOISETOWER.sensorRadiusSquared;
+        final int attackRd = RobotType.NOISETOWER.attackRadiusMaxSquared;
+
+
+    }
+
     static void spot() throws GameActionException
     {
         Robot[] enemies = rc.senseNearbyGameObjects(
@@ -14,15 +27,21 @@ public class Tower
 
     public static void run(RobotController rc) throws GameActionException
     {
-        Pastr.rc = rc;
-        Pastr.comm = new Comm(rc);
+        Tower.rc = rc;
+        Tower.comm = new Comm(rc);
+        growth = rc.senseCowGrowth();
 
         while (true) {
             spot();
+
+            if (rc.isActive()) shoot();
+            else analyse();
+
             rc.yield();
         }
     }
 
     static RobotController rc;
     static Comm comm;
+    static double[][] growth;
 }
