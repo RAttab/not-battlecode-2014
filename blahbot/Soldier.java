@@ -43,6 +43,27 @@ public class Soldier
         return null;
     }
 
+    static boolean build() throws GameActionException
+    {
+        Robot[] allies = rc.senseNearbyGameObjects(
+                Robot.class, RobotType.SOLDIER.sensorRadiusSquared, Utils.me);
+        if (allies.length == 0) return false;
+
+        boolean seenPastr = false;
+        for (int i = allies.length; i-- > 0;) {
+            RobotInfo info = rc.senseRobotInfo(allies[i]);
+
+            if (info.type == RobotType.NOISETOWER) return false;
+            if (info.type == RobotType.PASTR) seenPastr = true;
+            if (info.isConstructing) {
+                if (info.constructingType == RobotType.PASTR) seenPastr = true;
+                else return false;
+            }
+        }
+
+        return seenPastr;
+    }
+
     public static void run(RobotController rc) throws GameActionException
     {
         Soldier.rc = rc;
@@ -72,6 +93,9 @@ public class Soldier
                 if (pathing.getTarget() != null)
                     move(pathing.direction());
             }
+
+            else if (build())
+                rc.construct(RobotType.NOISETOWER);
 
             else {
                 MapLocation pos;
