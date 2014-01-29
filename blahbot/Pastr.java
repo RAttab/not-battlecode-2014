@@ -20,12 +20,7 @@ public class Pastr
         ProgressQuest pq = new ProgressQuest(rc);
 
         while (true) {
-            Math.random();
-            if (!rc.isActive()) { rc.yield(); continue; }
-
             spot();
-            pq.progress();
-
             rc.yield();
         }
     }
