@@ -20,12 +20,32 @@ public class Soldier
             return;
         }
 
-        final MapLocation pos = rc.getLocation();
-        boolean mySide =
-            pos.distanceSquaredTo(Utils.myHq) <=
-            pos.distanceSquaredTo(Utils.hisHq);
+        boolean sneak;
 
-        if (mySide)
+        final MapLocation pos = rc.getLocation();
+        final MapLocation pastr = Utils.pastr(rc);
+
+        if (pastr != null) {
+            int pastrDist = pos.distanceSquaredTo(pastr);
+            int pastrDir = pos.directionTo(pastr).ordinal();
+
+            final int minRange =
+                GameConstants.PASTR_RANGE +
+                GameConstants.MOVEMENT_SCARE_RANGE;
+            final int maxRange = minRange + 20;
+
+            // heading towards pastr.
+
+            int thresh = Math.abs(pastrDir - dir.ordinal()) <= 2 ? minRange : maxRange;
+            sneak = pastrDist < thresh;
+        }
+        else {
+            sneak =
+                pos.distanceSquaredTo(Utils.myHq) <=
+                pos.distanceSquaredTo(Utils.hisHq);
+        }
+
+        if (sneak)
             rc.sneak(dir);
         else rc.move(dir);
     }

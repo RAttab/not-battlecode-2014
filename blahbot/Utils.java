@@ -64,6 +64,12 @@ class Utils
     }
 
 
+    static MapLocation pastr(RobotController rc) throws GameActionException
+    {
+        MapLocation[] pastrs = rc.sensePastrLocations(me);
+        return pastrs.length > 0 ? pastrs[0] : null;
+    }
+
     static boolean canMoveTo(RobotController rc, MapLocation dest, int max)
         throws GameActionException
     {
