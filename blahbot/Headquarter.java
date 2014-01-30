@@ -47,6 +47,7 @@ public class Headquarter
         }
 
         if (bestTarget == null) return false;
+        if (rc.getActionDelay() > 0) return false;
 
         rc.attackSquare(rc.senseLocationOf(bestTarget));
         return true;
@@ -66,7 +67,7 @@ public class Headquarter
         while (true) {
             ByteCode.Check bcCheck = new ByteCode.Check(rc);
 
-            if (rc.isActive() && !shoot()) spawn();
+            if (rc.isActive()) spawn();
             general.command();
 
             bcCheck.debug_check("Headquarter.end");
