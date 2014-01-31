@@ -8,7 +8,7 @@ public class Soldier
 
     static void debug_dump()
     {
-        if (Clock.getRoundNum() % 10 > 0) return;
+        if (Clock.getRoundNum() % 100 > 0) return;
 
         combat.debug_dump();
     }
@@ -106,9 +106,8 @@ public class Soldier
 
             if (combat.isCombat() == SoldierCombat.CombatState.YES) {
                 rc.setIndicatorString(0, "soldier.combat");
-                pathing.setTarget(combat.exterminate());
-                if (pathing.getTarget() != null)
-                    move(pathing.direction());
+                combat.exterminate();
+                pathing.setTarget(null);
             }
 
             else if (build())

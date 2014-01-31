@@ -41,13 +41,27 @@ class SoldierCombat
         double totalDmg = -health;
         RobotInfo target = null;
 
+        int enemies = 0;
+        int centerX = 0;
+        int centerY = 0;
+
         // Survey the potential carnage.
         for (int i = suicideEnemies.length; i-- > 0;) {
-            RobotInfo info = target = rc.senseRobotInfo(suicideEnemies[i]);
+            RobotInfo info = rc.senseRobotInfo(suicideEnemies[i]);
             if (info.type == RobotType.HQ) continue;
 
             totalDmg += Math.min(dmg, info.health);
             killed += dmg >= info.health ? 1 : 0;
+
+            enemies++;
+            centerX += info.location.x;
+            centerY += info.location.y;
+
+            if (target == null) {
+                target = info;
+                continue;
+            }
+            if (info.health < target.health) target = info;
         }
 
         // Will this hurt me more then it'll hurt you?
@@ -70,10 +84,21 @@ class SoldierCombat
             return;
         }
 
-        // Something smells wrong... Back the fuck off.
-        // \todo Investigate a smarter way to back the fuck off.
-        Direction dir = pos.directionTo(target.location);
-        move(dir.opposite());
+        // Something smells wrong...
+
+        // We can kill him before boom time. Do so.
+        if (enemies == 1 && target.health < attackPw) {
+            rc.attackSquare(target.location);
+            return;
+        }
+
+        // Back the fuck off.
+        MapLocation center =
+            new MapLocation(centerX / enemies, centerY / enemies);
+        if (move(center.directionTo(pos))) return;
+
+        // Well... crap... Let's go out shooting!
+        rc.attackSquare(target.location);
     }
 
 
@@ -142,12 +167,9 @@ class SoldierCombat
             targetShots = shots;
         }
 
-        // \todo Need something smarter.
-        if (hasHq && reachableEnemies.length == 1) return;
-
         MapLocation center = new MapLocation(
-                centerX / reachableEnemies.length,
-                centerY / reachableEnemies.length);
+                centerX / (reachableEnemies.length - (hasHq ? 1 : 0)),
+                centerY / (reachableEnemies.length - (hasHq ? 1 : 0)));
         rc.setIndicatorString(1, "combat.attack.spot: " + center.toString());
         comm.spot(center);
 
@@ -170,26 +192,24 @@ class SoldierCombat
         }
 
 
-        // KAMIKAZE!
+        // Ruh Roh!
+        if (hisHealth > myHealth + attackPw) {
 
-        if (hisHealth > myHealth + attackPw && health <= minHealth) {
+            // KAMIKAZE!
+            if (health < minHealth && pos != center) {
 
-            // Well fuck. Our heuristic let us down...
-            if (pos == center) {
-                move(pos.directionTo(nearest.location));
-                return;
+                // Move towards the center mass of enemies. Maximize the damage.
+                // Why do I feel like a terrorist...?
+                if (Utils.canMoveTo(rc, center, attackRd)) {
+                    if (move(pos.directionTo(center))) return;
+                }
+
+                // Can't move to our target. No virgins for the lazy...
             }
 
-            // Move towards the center mass of enemies. Maximize the damage.
-            // Why do I feel like a terrorist...?
-            else if (Utils.canMoveTo(rc, center, attackRd)) {
-                move(pos.directionTo(center));
-                return;
-            }
-
-            // Can't move to our target. No virgins for the lazy...
+            // Time to leave methink.
+            if (move(center.directionTo(pos))) return;
         }
-
 
         // Oh shit. We have guns? Pew pew!
 
@@ -199,7 +219,7 @@ class SoldierCombat
 
     // \todo Don't step into attack range and give them first shot.
     Robot[] visibleEnemies;
-    MapLocation visible() throws GameActionException
+    void visible() throws GameActionException
     {
         final MapLocation pos = rc.getLocation();
 
@@ -222,8 +242,11 @@ class SoldierCombat
         }
 
         // Defense-less towers? How nice of you!
-        if (enemies == 0)
-            return base.location;
+        if (enemies == 0) {
+            if (!move(pos.directionTo(base.location)))
+                move(base.location.directionTo(pos));
+            return;
+        }
 
         MapLocation center = new MapLocation(
                 centerX / enemies, centerY / enemies);
@@ -233,14 +256,15 @@ class SoldierCombat
         Robot[] allies  = rc.senseNearbyGameObjects(
                 Robot.class, RobotType.SOLDIER.sensorRadiusSquared, Utils.me);
 
-        if (enemies <= allies.length + 1) return center;
+        if (enemies <= allies.length + 1 && move(pos.directionTo(center)))
+            return;
 
         // Outnumbered and outguned. Running away sounds like a good idea.
-        return comm.getRallyPoint();
+        move(center.directionTo(pos));
     }
 
 
-    MapLocation exterminate() throws GameActionException
+    void exterminate() throws GameActionException
     {
         Robot[] suicideEnemies = rc.senseNearbyGameObjects(
                 Robot.class, Utils.SelfDestructRangeSq, Utils.him);
@@ -248,7 +272,7 @@ class SoldierCombat
             suicideProf.debug_start();
             suicide(suicideEnemies);
             suicideProf.debug_stop();
-            return null;
+            return;
         }
 
         Robot[] reachableEnemies = rc.senseNearbyGameObjects(
@@ -257,21 +281,35 @@ class SoldierCombat
             attackProf.debug_start();
             attack(reachableEnemies);
             attackProf.debug_stop();
-            return null;
+            return;
         }
 
         visibleProf.debug_start();
-        MapLocation target = visible();
+        visible();
         visibleProf.debug_stop();
-        return target;
     }
 
 
-    void move(Direction dir) throws GameActionException
+    boolean move(Direction desired) throws GameActionException
     {
-        if (dir == Direction.OMNI || dir == Direction.NONE) return;
-        if (!rc.canMove(dir)) return;
-        rc.move(dir);
+        if (rc.canMove(desired)) {
+            rc.move(desired);
+            return true;
+        };
+
+        Direction right = desired.rotateRight();
+        if (rc.canMove(right)) {
+            rc.move(right);
+            return true;
+        }
+
+        Direction left = desired.rotateLeft();
+        if (rc.canMove(left)) {
+            rc.move(left);
+            return true;
+        }
+
+        return false;
     }
 
     void debug_dump()
