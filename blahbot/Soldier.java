@@ -87,7 +87,7 @@ public class Soldier
         }
 
         if (pastrPos == null) return false;
-        return rc.getLocation().distanceSquaredTo(pastrPos) < 10;
+        return rc.getLocation().distanceSquaredTo(pastrPos) < GameConstants.PASTR_RANGE;
     }
 
     public static void run(RobotController rc) throws GameActionException
