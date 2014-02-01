@@ -11,6 +11,7 @@ public class Soldier
         if (Clock.getRoundNum() % 100 > 0) return;
 
         combat.debug_dump();
+        pathing.debug_dump();
     }
 
     static void move(Direction dir) throws GameActionException
@@ -46,8 +47,8 @@ public class Soldier
         }
 
         if (sneak)
-            rc.sneak(dir);
-        else rc.move(dir);
+            pathing.sneak(dir);
+        else pathing.move(dir);
     }
 
     static MapLocation reinforce() throws GameActionException
@@ -90,12 +91,18 @@ public class Soldier
         return rc.getLocation().distanceSquaredTo(pastrPos) < GameConstants.PASTR_RANGE;
     }
 
+    static boolean atTarget(MapLocation myPos)
+    {
+        if (pathing.getTarget() == null) return true;
+        return myPos.distanceSquaredTo(pathing.getTarget()) < 5;
+    }
+
     public static void run(RobotController rc) throws GameActionException
     {
         Soldier.rc = rc;
         Soldier.comm = new Comm(rc);
         Soldier.combat = new SoldierCombat(rc, comm);
-        Soldier.pathing = new BugPathing(rc);
+        Soldier.pathing = new LookAheadPathing(rc);
 
         while (true) {
 
@@ -107,6 +114,7 @@ public class Soldier
             if (combat.isCombat() == SoldierCombat.CombatState.YES) {
                 rc.setIndicatorString(0, "soldier.combat");
                 combat.exterminate();
+                pathing.reset();
             }
 
             else if (build())
@@ -131,7 +139,7 @@ public class Soldier
                     rc.setIndicatorString(0, "soldier.orders: " + pos.toString());
                 }
 
-                else if (pathing.getTarget() == null || myPos.equals(pathing.getTarget())) {
+                else if (atTarget(myPos)) {
                     pathing.setTarget(pos = comm.getRallyPoint());
                     rc.setIndicatorString(0, "soldier.rally: " + pos.toString());
                 }
@@ -149,7 +157,7 @@ public class Soldier
     }
 
     static RobotController rc;
-    static BugPathing pathing;
+    static LookAheadPathing pathing;
     static Comm comm;
     static SoldierCombat combat;
 }
