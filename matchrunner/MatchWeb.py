@@ -6,7 +6,7 @@
 # Description:      An http based match frontend for battlecode
 # Author:           Marc Vieira Cardinal
 # Creation Date:    January 14, 2014
-# Revision Date:    January 15, 2014
+# Revision Date:    February 1, 2014
 # **********
 
 
@@ -62,6 +62,7 @@ def Main(db):
         FROM `maps`
         ORDER BY `name` ASC
         """).fetchall()
+    tplData['mapNames'].append("all")
 
     return template("main.tpl", tplData)
 
@@ -74,16 +75,32 @@ def SubmitMatch(db):
     mapName = request.forms.mapName
 
     if botA and botB and mapName:
-        cursor.execute("""
-            INSERT INTO `matches`
-                (`schedon`, `bota`, `botb`, `map`, `state`)
-            VALUES
-                (?, ?, ?, ?, ?)
-            """, (time.strftime("%Y-%m-%d %H:%M:%S"),
-                  botA,
-                  botB,
-                  mapName,
-                  'queued'))
+
+        if mapName != "all":
+            cursor.execute("""
+                INSERT INTO `matches`
+                    (`schedon`, `bota`, `botb`, `map`, `state`)
+                VALUES
+                    (?, ?, ?, ?, ?)
+                """, (time.strftime("%Y-%m-%d %H:%M:%S"),
+                      botA,
+                      botB,
+                      mapName,
+                      'queued'))
+        else:
+            for mapName in cursor.execute("SELECT `name`
+                                           FROM `maps`
+                                           ORDER BY `name` ASC").fetchall():
+            cursor.execute("""
+                INSERT INTO `matches`
+                    (`schedon`, `bota`, `botb`, `map`, `state`)
+                VALUES
+                    (?, ?, ?, ?, ?)
+                """, (time.strftime("%Y-%m-%d %H:%M:%S"),
+                      botA,
+                      botB,
+                      mapName,
+                      'queued'))
 
     # Return our default page
     redirect("/")
