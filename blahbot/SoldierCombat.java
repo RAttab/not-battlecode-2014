@@ -88,7 +88,7 @@ class SoldierCombat
 
         // We can kill him before boom time. Do so.
         if (enemies == 1 && target.health < attackPw) {
-            rc.attackSquare(target.location);
+            attack(target.location);
             return;
         }
 
@@ -98,7 +98,7 @@ class SoldierCombat
         if (move(center.directionTo(pos))) return;
 
         // Well... crap... Let's go out shooting!
-        rc.attackSquare(target.location);
+        attack(target.location);
     }
 
 
@@ -215,7 +215,7 @@ class SoldierCombat
 
         // Oh shit. We have guns? Pew pew!
 
-        if (target != null) rc.attackSquare(target.location);
+        if (target != null) attack(target.location);
     }
 
 
@@ -306,22 +306,30 @@ class SoldierCombat
         visibleProf.debug_stop();
     }
 
+    void attack(MapLocation target) throws GameActionException
+    {
+        if (rc.getActionDelay() >= 1.0) return;
+        rc.attackSquare(target);
+    }
 
     boolean move(Direction desired) throws GameActionException
     {
         if (rc.canMove(desired)) {
+            if (rc.getActionDelay() >= 1.0) return true;
             rc.move(desired);
             return true;
         };
 
         Direction right = desired.rotateRight();
         if (rc.canMove(right)) {
+            if (rc.getActionDelay() >= 1.0) return true;
             rc.move(right);
             return true;
         }
 
         Direction left = desired.rotateLeft();
         if (rc.canMove(left)) {
+            if (rc.getActionDelay() >= 1.0) return true;
             rc.move(left);
             return true;
         }

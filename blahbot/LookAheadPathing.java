@@ -69,9 +69,9 @@ class LookAheadPathing
         lookAheadProf.debug_start();
 
         MapLocation prev;
-        for (int i = 1; i-- > 0;) {
+        for (int i = 2; i-- > 0;) {
             prev = pos;
-            pos = pos.add(hug(pos, rotate(facing, rotateRight), rotateRight));
+            pos = pos.add(hug(pos, facing, rotateRight));
             facing = prev.directionTo(pos);
         }
 
@@ -104,8 +104,11 @@ class LookAheadPathing
             return facing;
         }
 
+        // System.out.println ("hug: facing=" + facing + ", right=" + rotateRight);
+
         Direction dir = rotate(facing, !rotateRight);
         for (int i = 8; i-- > 0;) {
+            // System.out.println("  step: " + dir);
 
             if (canMove(pos, dir)) {
                 hugProf.debug_stop();
@@ -121,12 +124,14 @@ class LookAheadPathing
 
     void move(Direction dir) throws GameActionException
     {
+        if (rc.getActionDelay() >= 1.0) return;
         prev = rc.getLocation();
         rc.move(dir);
     }
 
     void sneak(Direction dir) throws GameActionException
     {
+        if (rc.getActionDelay() >= 1.0) return;
         prev = rc.getLocation();
         rc.sneak(dir);
     }
