@@ -86,7 +86,7 @@ class LookAheadPathing
 
     boolean canMove(MapLocation pos, Direction dir) throws GameActionException
     {
-        if (pos == rc.getLocation()) return rc.canMove(dir);
+        if (pos.equals(rc.getLocation())) return rc.canMove(dir);
 
         pos = pos.add(dir);
         TerrainTile tile = rc.senseTerrainTile(pos);
@@ -99,7 +99,7 @@ class LookAheadPathing
     {
         hugProf.debug_start();
 
-        if (facing == pos.directionTo(target) && canMove(pos, facing)) {
+        if (facing.equals(pos.directionTo(target)) && canMove(pos, facing)) {
             hugProf.debug_stop();
             return facing;
         }

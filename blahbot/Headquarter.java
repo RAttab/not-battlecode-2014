@@ -9,11 +9,13 @@ public class Headquarter
     {
         if (rc.senseRobotCount() == GameConstants.MAX_ROBOTS) return false;
 
-        Direction spawnDir = Utils.myHq.directionTo(Utils.hisHq);
+        Direction dir = Utils.myHq.directionTo(Utils.hisHq);
 
-        for (int i = spawnDir.ordinal(); i < 8; i++) {
-            Direction dir = Utils.dirs[i % 8];
-            if (!rc.canMove(dir)) continue;
+        for (int i = 8; i-- > 0;) {
+            if (!rc.canMove(dir)) {
+                dir = dir.rotateRight();
+                continue;
+            }
             rc.spawn(dir);
             return true;
         }
