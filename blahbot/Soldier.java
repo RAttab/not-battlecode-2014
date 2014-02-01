@@ -107,7 +107,6 @@ public class Soldier
             if (combat.isCombat() == SoldierCombat.CombatState.YES) {
                 rc.setIndicatorString(0, "soldier.combat");
                 combat.exterminate();
-                pathing.setTarget(null);
             }
 
             else if (build())
