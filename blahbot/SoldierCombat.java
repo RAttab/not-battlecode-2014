@@ -130,7 +130,9 @@ class SoldierCombat
 
             centerX += info.location.x;
             centerY += info.location.y;
-            hisHealth += info.health;
+
+            if (info.type == RobotType.SOLDIER && !info.isConstructing)
+                hisHealth += info.health;
 
             int dist = pos.distanceSquaredTo(info.location);
 
@@ -146,7 +148,7 @@ class SoldierCombat
                 nearestDist = dist;
             }
 
-            // Prefer non-constructing robots.
+            // Prefer non-constructing soldier robots.
             if (info.isConstructing && !target.isConstructing) continue;
             if (info.type != RobotType.SOLDIER && target.type == RobotType.SOLDIER)
                 continue;
@@ -260,7 +262,6 @@ class SoldierCombat
 
         MapLocation center = new MapLocation(
                 centerX / enemies, centerY / enemies);
-        rc.setIndicatorString(1, "combat.visible.spot: " + center.toString());
         comm.spot(center);
 
         Robot[] allies  = rc.senseNearbyGameObjects(
