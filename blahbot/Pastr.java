@@ -21,6 +21,7 @@ public class Pastr
 
         while (true) {
             spot();
+            pq.progress();
             rc.yield();
         }
     }
