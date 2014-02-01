@@ -32,13 +32,21 @@ class LookAheadPathing
         Direction targetDir = pos.directionTo(target);
         Direction facing = prev == null ? targetDir : prev.directionTo(pos);
 
+        // System.out.println("");
+        // System.out.println("[ pathing ]=========================================");
+        // System.out.println("pos: " + pos);
+        // System.out.println("prev: " + prev);
+        // System.out.println("facing: " + facing);
+        // System.out.println("target: " + target);
+        // System.out.println("targetDir: " + targetDir);
+
         if (!wallHugging) {
             if (rc.canMove(targetDir)) {
                 prof.debug_stop();
                 return targetDir;
             }
 
-            wallHugging = true;
+            wallHugging = rc.senseObjectAtLocation(pos.add(targetDir)) == null;
             MapLocation right = lookAhead(pos, facing, true);
             MapLocation left = lookAhead(pos, facing, false);
 
@@ -48,7 +56,7 @@ class LookAheadPathing
         }
 
         Direction dir = hug(pos, facing, rotateRight);
-        wallHugging = dir != targetDir;
+        wallHugging = wallHugging && dir != targetDir;
 
         prof.debug_stop();
         return dir;
@@ -63,7 +71,7 @@ class LookAheadPathing
         MapLocation prev;
         for (int i = 1; i-- > 0;) {
             prev = pos;
-            pos = pos.add(hug(pos, facing, rotateRight));
+            pos = pos.add(hug(pos, rotate(facing, rotateRight), rotateRight));
             facing = prev.directionTo(pos);
         }
 
