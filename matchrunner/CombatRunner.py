@@ -7,7 +7,7 @@
 #                   and get the results in json
 # Author:           Marc Vieira Cardinal
 # Creation Date:    January 18, 2013
-# Revision Date:    January 15, 2014
+# Revision Date:    February 1, 2014
 # **********
 
 
@@ -74,10 +74,15 @@ class CombatRunner:
             line = line.strip()
             roundStr = "[TRAIN] Round "
 
-            if line.startswith("[java] [server]") and line.endswith("wins"):
+            if (line.startswith("[java] [server]")
+                and "wins" in line
+                and line.endswith(")")):
                 winnerItems = line.split(" ")
-                result['winnerName'] = winnerItems[-3]
-                result['winnerTeam'] = winnerItems[-2][1]
+                print "****"
+                print winnerItems
+                print "****"
+                result['winnerName'] = winnerItems[-5]
+                result['winnerTeam'] = winnerItems[-4][1]
             elif line.count(roundStr) > 0:
                 split = line.split(" ")
 
