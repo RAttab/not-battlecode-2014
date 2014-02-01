@@ -107,7 +107,10 @@ public class Soldier
         while (true) {
 
             // \todo Might want to do some calcs in our off turns.
-            if (!rc.isActive()) { rc.yield(); continue; }
+            if (!rc.isActive() || rc.getActionDelay() >= 1.0) {
+                rc.yield();
+                continue;
+            }
 
             ByteCode.Check bcCheck = new ByteCode.Check(rc);
 
