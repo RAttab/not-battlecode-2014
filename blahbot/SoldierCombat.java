@@ -222,10 +222,14 @@ class SoldierCombat
     void visible() throws GameActionException
     {
         final MapLocation pos = rc.getLocation();
+        final int attackRange = RobotType.SOLDIER.attackRadiusMaxSquared;
 
         int enemies = 0;
         RobotInfo base = null;
         int centerX = 0, centerY = 0;
+
+        int nearestDist = 100;
+        MapLocation nearest = null;
 
         for (int i = visibleEnemies.length; i-- > 0; ) {
             RobotInfo info = rc.senseRobotInfo(visibleEnemies[i]);
@@ -234,6 +238,12 @@ class SoldierCombat
                 if (base == null) base = info;
                 else if (base.type == RobotType.NOISETOWER) base = info;
                 continue;
+            }
+
+            int dist = pos.distanceSquaredTo(info.location);
+            if (dist < nearestDist) {
+                nearest = info.location;
+                nearestDist = dist;
             }
 
             enemies++;
@@ -256,11 +266,17 @@ class SoldierCombat
         Robot[] allies  = rc.senseNearbyGameObjects(
                 Robot.class, RobotType.SOLDIER.sensorRadiusSquared, Utils.me);
 
-        if (enemies <= allies.length + 1 && move(pos.directionTo(center)))
-            return;
-
         // Outnumbered and outguned. Running away sounds like a good idea.
-        move(center.directionTo(pos));
+        if (enemies > allies.length) {
+            move(center.directionTo(pos));
+            return;
+        }
+
+        Direction dir = pos.directionTo(center);
+        boolean inRange = pos.add(dir).distanceSquaredTo(nearest) <= attackRange;
+
+        // Don't give em the first shot
+        if (!inRange || enemies <= allies.length * 2) move(dir);
     }
 
 
